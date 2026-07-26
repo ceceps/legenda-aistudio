@@ -11,7 +11,8 @@
     "GOOGLE_DRIVE_FOLDER_ID",
     "GOOGLE_SERVICE_ACCOUNT_JSON",
     "FRONTEND_URL",
-    "REDIS_URL"
+    "REDIS_URL",
+    "VITE_API_URL"
   ],
   "tasks": {
     "build": {

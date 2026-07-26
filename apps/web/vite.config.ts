@@ -3,14 +3,15 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
   },
-  server: {
+  // Dev-only proxy — in production the frontend calls VITE_API_URL directly
+  server: mode === 'development' ? {
     port: 5173,
     proxy: {
       '/api': {
@@ -22,5 +23,5 @@ export default defineConfig({
         ws: true,
       },
     },
-  },
-});
+  } : undefined,
+}));

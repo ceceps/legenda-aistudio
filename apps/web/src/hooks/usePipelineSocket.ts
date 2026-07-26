@@ -2,7 +2,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { type PipelineProgressEvent } from '@legenda/shared-types';
 import { useProjectStore } from '@/store/projectStore';
 
-const WS_URL = `ws://${window.location.host}/ws`;
+import { WS_URL } from '@/api/client';
 
 export function usePipelineSocket(projectId: string | null) {
   const ws = useRef<WebSocket | null>(null);
