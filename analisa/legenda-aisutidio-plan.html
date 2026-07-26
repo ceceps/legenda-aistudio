@@ -1,0 +1,318 @@
+
+<!-- saved from url=(0081)file:///C:/Users/ASUS/AppData/Local/Temp/bob-artifacts/legenda-aistudio-plan.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Legenda AI Studio — Architecture Plan</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, "Segoe UI", system-ui, sans-serif; font-size: 14px; line-height: 1.6; color: #1f2328; background: #fff; padding: 32px 16px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { color: #57606a; font-size: 13px; margin-bottom: 28px; }
+  h2 { font-size: 16px; font-weight: 700; margin: 28px 0 10px; border-bottom: 2px solid #e5e7eb; padding-bottom: 6px; }
+  h3 { font-size: 14px; font-weight: 600; margin: 16px 0 6px; color: #3b82d4; }
+  p { margin-bottom: 8px; }
+  ul, ol { padding-left: 20px; margin-bottom: 8px; }
+  li { margin-bottom: 3px; }
+  code { background: #f7f8fa; border: 1px solid #e5e7eb; border-radius: 4px; padding: 1px 5px; font-size: 12px; font-family: "Courier New", monospace; }
+  .badge { display: inline-block; background: #f7f8fa; border: 1px solid #e5e7eb; border-radius: 12px; padding: 2px 10px; font-size: 11px; color: #57606a; margin: 2px; }
+  .badge.blue { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
+  .badge.purple { background: #f5f3ff; border-color: #ddd6fe; color: #6d28d9; }
+  .badge.green { background: #f0fdf4; border-color: #bbf7d0; color: #15803d; }
+  .badge.orange { background: #fff7ed; border-color: #fed7aa; color: #c2410c; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 13px; }
+  th { background: #f7f8fa; border: 1px solid #e5e7eb; padding: 7px 10px; text-align: left; font-weight: 600; }
+  td { border: 1px solid #e5e7eb; padding: 7px 10px; vertical-align: top; }
+  tr:nth-child(even) td { background: #fafafa; }
+  .phase { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+  .phase-num { min-width: 28px; height: 28px; border-radius: 50%; background: #3b82d4; color: #fff; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  .phase-body { flex: 1; }
+  .phase-body strong { font-size: 14px; }
+  .phase-body p { color: #57606a; font-size: 13px; margin-top: 2px; }
+  .pipeline { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; align-items: center; }
+  .pill { background: #f7f8fa; border: 1px solid #e5e7eb; border-radius: 6px; padding: 5px 12px; font-size: 12px; white-space: nowrap; }
+  .arrow { color: #57606a; font-size: 14px; }
+  .box { background: #f7f8fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px 16px; margin-bottom: 14px; }
+  .box-title { font-weight: 600; font-size: 13px; margin-bottom: 6px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  .prompt-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 16px; font-size: 13px; color: #1e3a5f; margin-bottom: 14px; font-family: "Courier New", monospace; }
+  footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid #e5e7eb; text-align: center; font-size: 12px; color: #57606a; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Legenda AI Studio</h1>
+  <div class="subtitle">Architecture &amp; Implementation Plan — Story-to-Video AI Pipeline</div>
+
+  
+  <h2>Master Prompt Template</h2>
+  <div class="prompt-box">
+    "Buatkan cerita <strong>[IDE]</strong> yang diubah menjadi dengan gaya <strong>[GAYA]</strong> tentang <strong>[TOKOH UTAMA]</strong> dari <strong>[ASAL DAERAH]</strong> pada zaman dengan latar <strong>[LATAR]</strong> dan plot <strong>[PLOT]</strong>"
+  </div>
+  <table>
+    <tbody><tr><th>Field</th><th>Type</th><th>Values / Notes</th></tr>
+    <tr><td><code>IDE</code></td><td>Text input</td><td>Free-text ide cerita dari user</td></tr>
+    <tr><td><code>GAYA</code></td><td>Combo select</td><td>Klasik · Saat Ini · Futuristik · Super Hero</td></tr>
+    <tr><td><code>TOKOH UTAMA</code></td><td>Text input</td><td>Misal: Si Jampang, Sangkuriang, dll.</td></tr>
+    <tr><td><code>ASAL DAERAH</code></td><td>Text input</td><td>Misal: Betawi, Sunda, Jawa Timur</td></tr>
+    <tr><td><code>LATAR</code></td><td>Combo select</td><td>Sebelum Masehi · Masehi (pilih rentang tahun)</td></tr>
+    <tr><td><code>PLOT</code></td><td>Text input</td><td>Ringkasan plot / konflik utama cerita</td></tr>
+  </tbody></table>
+
+  
+  <h2>Pipeline — 7 Stage End-to-End</h2>
+  <div class="pipeline">
+    <span class="pill">① Master Prompt</span><span class="arrow">→</span>
+    <span class="pill">② Screenplay</span><span class="arrow">→</span>
+    <span class="pill">③ Asset Generation</span><span class="arrow">→</span>
+    <span class="pill">④ Music &amp; Audio</span><span class="arrow">→</span>
+    <span class="pill">⑤ Storyboard</span><span class="arrow">→</span>
+    <span class="pill">⑥ Video Scenes</span><span class="arrow">→</span>
+    <span class="pill">⑦ Final Merge</span>
+  </div>
+
+  
+  <h2>Stage Detail</h2>
+
+  <div class="phase">
+    <div class="phase-num">1</div>
+    <div class="phase-body">
+      <strong>Master Prompt → Full Screenplay (Naskah Lengkap)</strong>
+      <p>AI: <strong>Gemini 2.0 Flash</strong> (generasi teks panjang, structured JSON output)</p>
+      <ul>
+        <li>Daftar aktor + deskripsi persona + kostum tiap karakter</li>
+        <li>Dasar cerita, konflik utama, resolusi</li>
+        <li>Latar / setting per scene (nama tempat, waktu, suasana)</li>
+        <li>Voice Over / Narator script per scene</li>
+        <li>Petunjuk musik latar (mood, tempo, instrumen)</li>
+        <li>Plot breakdown: Pembuka → Rising Action → Klimaks → Resolusi</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-num">2</div>
+    <div class="phase-body">
+      <strong>Asset Generation — Karakter, Item, Background</strong>
+      <p>AI: <strong>NVIDIA Nemotron</strong> (image generation prompt crafting) + Image model via Composio API</p>
+      <ul>
+        <li>Generate prompt visual karakter tiap aktor (wajah, tubuh, kostum, gaya era)</li>
+        <li>Generate prompt visual item utiliti (senjata, properti, aksesori)</li>
+        <li>Generate prompt visual latar belakang per scene (background environment)</li>
+        <li>Output: daftar prompt → disimpan ke DB → antri job image gen</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-num">3</div>
+    <div class="phase-body">
+      <strong>Music &amp; Audio Generation</strong>
+      <p>AI: <strong>Suno API</strong> (musik &amp; lirik), <strong>Gemini</strong> (prompt lyric craftting)</p>
+      <ul>
+        <li><strong>Soundtrack Lagu</strong>: prompt lirik + genre → Suno generate lagu bertema cerita</li>
+        <li><strong>Backsound Instrumen Cinematic</strong>: prompt "no vocals, cinematic orchestral, [mood]" → Suno</li>
+        <li><strong>Voice Over / Narator</strong>: teks narator → Text-to-Speech (Google TTS / Gemini TTS)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-num">4</div>
+    <div class="phase-body">
+      <strong>Storyboard Generation — Per Scene (10 detik)</strong>
+      <p>AI: <strong>Gemini</strong> (layout &amp; komposisi) + <strong>Nemotron</strong> (visual prompt)</p>
+      <ul>
+        <li>Setiap scene → 1 storyboard card: gambar komposisi, angle kamera, aksi karakter</li>
+        <li>Anotasi: durasi, transisi, voice over snippet, musik aktif</li>
+        <li>Estimasi total scene: 18–22 scene untuk video ≥ 3 menit</li>
+        <li>Storyboard disimpan sebagai JSON + preview image di storage</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-num">5</div>
+    <div class="phase-body">
+      <strong>Video Generation — Per Scene</strong>
+      <p>API: <strong>Composio</strong> (orchestrate video gen tool) → Runway / Kling / Hailuo (10 det/scene)</p>
+      <ul>
+        <li>Input: storyboard prompt + asset gambar karakter + background</li>
+        <li>Setiap scene di-generate sebagai clip 10 detik</li>
+        <li>Job antrean async; status real-time via WebSocket ke frontend</li>
+        <li>Clip tersimpan di Google Drive folder per project</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-num">6</div>
+    <div class="phase-body">
+      <strong>Final Video Merge</strong>
+      <p>Tool: <strong>FFmpeg</strong> (via Docker container job)</p>
+      <ul>
+        <li>Gabung semua clip scene secara berurutan</li>
+        <li>Mix audio layer: Backsound instrumen (volume rendah) + Soundtrack + Voice Over (foreground)</li>
+        <li>Tambah fade in/out, title card, credit akhir</li>
+        <li>Export: MP4 H.264, 1080p, ≥ 3 menit</li>
+        <li>Upload otomatis ke Google Drive → generate shareable link</li>
+        <li>User bisa download langsung dari aplikasi</li>
+      </ul>
+    </div>
+  </div>
+
+  
+  <h2>Tech Stack Mapping</h2>
+  <table>
+    <tbody><tr><th>Layer</th><th>Teknologi</th><th>Peran</th></tr>
+    <tr><td>Frontend</td><td><span class="badge blue">React + Vite</span> <span class="badge blue">TypeScript</span></td><td>UI input form, progress pipeline, preview storyboard, player video</td></tr>
+    <tr><td>Backend API</td><td><span class="badge green">Node.js / Express</span> <span class="badge green">TypeScript</span></td><td>REST + WebSocket, orchestrate job queue</td></tr>
+    <tr><td>AI — Teks</td><td><span class="badge purple">Gemini 2.0 Flash</span></td><td>Naskah, prompt crafting, voice over script, lyric prompt</td></tr>
+    <tr><td>AI — Visual Prompt</td><td><span class="badge purple">NVIDIA Nemotron</span></td><td>Detailed image &amp; video prompt generation untuk karakter/latar</td></tr>
+    <tr><td>AI — Musik</td><td><span class="badge purple">Suno API</span></td><td>Generate soundtrack lagu + backsound cinematic instrumental</td></tr>
+    <tr><td>Orchestration</td><td><span class="badge orange">Composio API</span></td><td>Tool-use: trigger video gen, Google Drive upload, job management</td></tr>
+    <tr><td>Video Render</td><td><span class="badge orange">FFmpeg (Docker)</span></td><td>Merge clips, mix audio, export final MP4</td></tr>
+    <tr><td>Storage</td><td><span class="badge green">Google Drive API</span></td><td>Simpan assets, clips, final video; shareable download link</td></tr>
+    <tr><td>Database</td><td><span class="badge green">PostgreSQL</span></td><td>Project, scene, asset, job status, user session</td></tr>
+    <tr><td>Container</td><td><span class="badge">Docker + Compose</span></td><td>Backend, worker, FFmpeg job, PostgreSQL</td></tr>
+    <tr><td>CI/CD</td><td><span class="badge">GitHub Actions</span></td><td>Build, test, deploy</td></tr>
+    <tr><td>IDE</td><td><span class="badge">IBM Bob IDE</span></td><td>Development &amp; AI-assisted coding</td></tr>
+  </tbody></table>
+
+  
+  <h2>Database Schema (Core Tables)</h2>
+  <div class="two-col">
+    <div class="box">
+      <div class="box-title">projects</div>
+      <ul>
+        <li><code>id</code> uuid PK</li>
+        <li><code>user_id</code> uuid</li>
+        <li><code>ide</code> text</li>
+        <li><code>gaya</code> enum</li>
+        <li><code>tokoh_utama</code> text</li>
+        <li><code>asal_daerah</code> text</li>
+        <li><code>latar</code> text</li>
+        <li><code>plot</code> text</li>
+        <li><code>status</code> enum (draft/processing/done)</li>
+        <li><code>final_video_url</code> text</li>
+        <li><code>drive_file_id</code> text</li>
+        <li><code>created_at</code> timestamp</li>
+      </ul>
+    </div>
+    <div class="box">
+      <div class="box-title">scenes</div>
+      <ul>
+        <li><code>id</code> uuid PK</li>
+        <li><code>project_id</code> uuid FK</li>
+        <li><code>scene_number</code> int</li>
+        <li><code>description</code> text</li>
+        <li><code>voice_over</code> text</li>
+        <li><code>image_prompt</code> text</li>
+        <li><code>video_prompt</code> text</li>
+        <li><code>storyboard_url</code> text</li>
+        <li><code>clip_url</code> text</li>
+        <li><code>duration_sec</code> int default 10</li>
+        <li><code>status</code> enum</li>
+      </ul>
+    </div>
+    <div class="box">
+      <div class="box-title">assets</div>
+      <ul>
+        <li><code>id</code> uuid PK</li>
+        <li><code>project_id</code> uuid FK</li>
+        <li><code>type</code> enum (character/item/background)</li>
+        <li><code>name</code> text</li>
+        <li><code>description</code> text</li>
+        <li><code>image_prompt</code> text</li>
+        <li><code>image_url</code> text</li>
+      </ul>
+    </div>
+    <div class="box">
+      <div class="box-title">audio_assets</div>
+      <ul>
+        <li><code>id</code> uuid PK</li>
+        <li><code>project_id</code> uuid FK</li>
+        <li><code>type</code> enum (soundtrack/backsound/voice_over)</li>
+        <li><code>suno_prompt</code> text</li>
+        <li><code>suno_job_id</code> text</li>
+        <li><code>audio_url</code> text</li>
+        <li><code>status</code> enum</li>
+      </ul>
+    </div>
+  </div>
+
+  
+  <h2>Monorepo Folder Structure</h2>
+  <div class="box">
+    <pre style="font-size:12px;line-height:1.7;font-family:&#39;Courier New&#39;,monospace;color:#1f2328">legenda-aistudio/
+├── apps/
+│   ├── web/                  ← React + Vite + TypeScript (Frontend)
+│   │   ├── src/
+│   │   │   ├── pages/        ← Home, Create, Project, Preview, Download
+│   │   │   ├── components/   ← MasterPromptForm, Pipeline, StoryboardGrid, VideoPlayer
+│   │   │   ├── hooks/        ← useProject, usePipeline, useWebSocket
+│   │   │   └── api/          ← typed API client
+│   │   └── vite.config.ts
+│   └── api/                  ← Express + TypeScript (Backend)
+│       ├── src/
+│       │   ├── routes/       ← /projects, /pipeline, /assets, /audio, /video
+│       │   ├── services/     ← gemini.ts, nemotron.ts, suno.ts, composio.ts, ffmpeg.ts
+│       │   ├── workers/      ← scene.worker.ts, video.worker.ts, audio.worker.ts
+│       │   ├── db/           ← PostgreSQL schema, migrations, queries
+│       │   └── lib/          ← drive.ts, queue.ts, websocket.ts
+│       └── Dockerfile
+├── docker-compose.yml
+├── .github/
+│   └── workflows/ci.yml
+└── analisa/
+    └── prompt.md</pre>
+  </div>
+
+  
+  <h2>UI Flow — Halaman Utama</h2>
+  <ol>
+    <li><strong>Halaman Create</strong> — Form master prompt (IDE, GAYA, TOKOH, ASAL, LATAR, PLOT) → tombol "Generate Cerita"</li>
+    <li><strong>Halaman Naskah</strong> — Tampil screenplay lengkap (aktor, plot, scene list) → konfirmasi lanjut</li>
+    <li><strong>Halaman Pipeline Progress</strong> — Real-time progress bar 7 stage via WebSocket (Asset → Audio → Storyboard → Video → Merge)</li>
+    <li><strong>Halaman Storyboard</strong> — Grid tiap scene: gambar + teks VO + info musik</li>
+    <li><strong>Halaman Preview &amp; Download</strong> — Video player HTML5, tombol Download, link Google Drive</li>
+  </ol>
+
+  
+  <h2>Estimasi Durasi Proses</h2>
+  <table>
+    <tbody><tr><th>Stage</th><th>Estimasi Waktu</th><th>Keterangan</th></tr>
+    <tr><td>Naskah (Gemini)</td><td>15–30 detik</td><td>Structured JSON output</td></tr>
+    <tr><td>Asset prompts (Nemotron)</td><td>20–40 detik</td><td>Semua karakter + background</td></tr>
+    <tr><td>Image generation</td><td>2–5 menit</td><td>Bergantung jumlah aset, paralel</td></tr>
+    <tr><td>Music (Suno)</td><td>1–3 menit</td><td>Soundtrack + backsound paralel</td></tr>
+    <tr><td>Video clips (per scene)</td><td>30–90 detik/scene</td><td>18 scene ≈ 9–27 menit (paralel antrian)</td></tr>
+    <tr><td>FFmpeg merge</td><td>1–3 menit</td><td>Tergantung resolusi &amp; durasi</td></tr>
+    <tr><td><strong>Total estimasi</strong></td><td><strong>~15–35 menit</strong></td><td>Dengan paralelisasi job</td></tr>
+  </tbody></table>
+
+  
+  <h2>Implementation Phases</h2>
+  <div class="phase">
+    <div class="phase-num">A</div>
+    <div class="phase-body"><strong>Phase 1 — Foundation (Sprint 1–2)</strong><p>Monorepo setup, Docker, PostgreSQL schema, auth user, form master prompt, integrasi Gemini → naskah JSON, tampilkan screenplay di UI</p></div>
+  </div>
+  <div class="phase">
+    <div class="phase-num">B</div>
+    <div class="phase-body"><strong>Phase 2 — Asset &amp; Audio (Sprint 3–4)</strong><p>Nemotron prompt gen, image generation via Composio, Suno soundtrack &amp; backsound, TTS voice over, simpan ke Drive</p></div>
+  </div>
+  <div class="phase">
+    <div class="phase-num">C</div>
+    <div class="phase-body"><strong>Phase 3 — Storyboard &amp; Video (Sprint 5–6)</strong><p>Storyboard generator per scene, video clip generation, async job queue, WebSocket progress UI</p></div>
+  </div>
+  <div class="phase">
+    <div class="phase-num">D</div>
+    <div class="phase-body"><strong>Phase 4 — Merge &amp; Delivery (Sprint 7)</strong><p>FFmpeg Docker worker, merge pipeline, Google Drive upload, download UI, final QA</p></div>
+  </div>
+
+  <footer>Made with IBM Bob</footer>
+</div>
+
+
+</body></html>
