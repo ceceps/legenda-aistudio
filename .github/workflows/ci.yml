@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, develop, dev]
+    branches: [main, develop]
   pull_request:
     branches: [main]
 
@@ -31,19 +31,11 @@ jobs:
       - name: Build shared-types
         run: pnpm --filter=@legenda/shared-types build
 
-      - name: Prisma generate
-        working-directory: apps/api
-        run: pnpm prisma generate
-        env:
-          DATABASE_URL: postgresql://user:pass@localhost:5432/db
-
       - name: Lint
         run: pnpm lint
 
       - name: Typecheck
         run: pnpm typecheck
-        env:
-          VITE_API_URL: https://placeholder.railway.app
 
   build:
     name: Build
@@ -64,7 +56,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Prisma generate
+      - name: Prisma generate (mock)
         working-directory: apps/api
         run: pnpm prisma generate
         env:
@@ -80,5 +72,3 @@ jobs:
           DATABASE_URL: postgresql://user:pass@localhost:5432/db
           GOOGLE_DRIVE_FOLDER_ID: placeholder
           REDIS_URL: redis://localhost:6379
-          VITE_API_URL: https://placeholder.railway.app
-          NODE_ENV: production
