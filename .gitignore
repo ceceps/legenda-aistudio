@@ -8,4 +8,5 @@ analisa/!.html
 node_modules
 apps/api/dist
 apps/web/dist 
+.pnpm-store
 
