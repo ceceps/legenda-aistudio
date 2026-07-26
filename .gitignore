@@ -6,10 +6,11 @@ analisa/!.html
 .env
 !.env-example
 node_modules
-apps/api/dist
-apps/web/dist 
 apps/api/node_modules
 apps/web/node_modules
+apps/web/dist
+packages/shared-types/node_modules
+packages/shared-types/dist
 .pnpm-store
 .turbo
 .vscode
