@@ -6,3 +6,6 @@ analisa/!.html
 .env
 !.env-example
 node_modules
+apps/api/dist
+apps/web/dist 
+
