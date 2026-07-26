@@ -5,10 +5,12 @@ import path from 'path';
 const SCOPES = ['https://www.googleapis.com/auth/drive.file'];
 
 function getDriveClient() {
-  const auth = new google.auth.GoogleAuth({
-    keyFile: process.env.GOOGLE_SERVICE_ACCOUNT_JSON,
-    scopes: SCOPES,
-  });
+  const authOptions: { keyFile?: string; scopes: string[] } = { scopes: SCOPES };
+  if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
+    authOptions.keyFile = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+  }
+
+  const auth = new google.auth.GoogleAuth(authOptions);
   return google.drive({ version: 'v3', auth });
 }
 
@@ -20,11 +22,13 @@ export async function uploadFileToDrive(
   const drive = getDriveClient();
   const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
 
+  const requestBody: { name: string; parents?: string[] } = { name: fileName };
+  if (folderId) {
+    requestBody.parents = [folderId];
+  }
+
   const res = await drive.files.create({
-    requestBody: {
-      name: fileName,
-      parents: folderId ? [folderId] : undefined,
-    },
+    requestBody,
     media: {
       mimeType,
       body: createReadStream(filePath),

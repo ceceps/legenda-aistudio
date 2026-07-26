@@ -2,7 +2,11 @@ import { Worker } from 'bullmq';
 import { connection, assetQueue } from '../lib/queue.js';
 import { prisma } from '../lib/prisma.js';
 import { broadcastProgress } from '../lib/websocket.js';
-import { generateScreenplay, generateStoryboard, generateAudioPrompts } from '../services/gemini.js';
+import {
+  generateScreenplay,
+  generateStoryboard,
+  generateAudioPrompts,
+} from '../services/gemini.js';
 import { ProjectStatus, AudioType } from '@legenda/shared-types';
 import { type PipelineJobData } from '../lib/queue.js';
 
@@ -33,15 +37,21 @@ export const storyWorker = new Worker<PipelineJobData>(
     };
 
     broadcastProgress({
-      projectId, stage: ProjectStatus.STORY_GENERATING, progress: 20,
-      message: 'Gemini sedang menulis naskah lengkap...', timestamp: new Date().toISOString(),
+      projectId,
+      stage: ProjectStatus.STORY_GENERATING,
+      progress: 20,
+      message: 'Gemini sedang menulis naskah lengkap...',
+      timestamp: new Date().toISOString(),
     });
 
     const screenplay = await generateScreenplay(input);
 
     broadcastProgress({
-      projectId, stage: ProjectStatus.STORY_GENERATING, progress: 50,
-      message: 'Menyimpan naskah & membuat storyboard...', timestamp: new Date().toISOString(),
+      projectId,
+      stage: ProjectStatus.STORY_GENERATING,
+      progress: 50,
+      message: 'Menyimpan naskah & membuat storyboard...',
+      timestamp: new Date().toISOString(),
     });
 
     // Generate storyboard scenes
@@ -51,7 +61,7 @@ export const storyWorker = new Worker<PipelineJobData>(
     const audioPrompts = await generateAudioPrompts(screenplay);
 
     // Persist to DB
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: any) => {
       // Save screenplay
       await tx.project.update({
         where: { id: projectId },
@@ -94,16 +104,22 @@ export const storyWorker = new Worker<PipelineJobData>(
     });
 
     broadcastProgress({
-      projectId, stage: ProjectStatus.STORY_DONE, progress: 60,
+      projectId,
+      stage: ProjectStatus.STORY_DONE,
+      progress: 60,
       message: `Naskah selesai! ${storyboardScenes.length} scene dibuat. Memulai generasi aset...`,
       timestamp: new Date().toISOString(),
     });
 
     // Chain to asset generation
-    await assetQueue.add('generate-assets', { projectId }, {
-      attempts: 3,
-      backoff: { type: 'exponential', delay: 5000 },
-    });
+    await assetQueue.add(
+      'generate-assets',
+      { projectId },
+      {
+        attempts: 3,
+        backoff: { type: 'exponential', delay: 5000 },
+      },
+    );
 
     await prisma.project.update({
       where: { id: projectId },
@@ -118,7 +134,10 @@ storyWorker.on('failed', async (job, err) => {
   const { projectId } = job.data;
   await prisma.project.update({ where: { id: projectId }, data: { status: ProjectStatus.FAILED } });
   broadcastProgress({
-    projectId, stage: ProjectStatus.FAILED, progress: 0,
-    message: `Gagal: ${err.message}`, timestamp: new Date().toISOString(),
+    projectId,
+    stage: ProjectStatus.FAILED,
+    progress: 0,
+    message: `Gagal: ${err.message}`,
+    timestamp: new Date().toISOString(),
   });
 });

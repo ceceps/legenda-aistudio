@@ -3,7 +3,7 @@ import { prisma } from '../lib/prisma.js';
 import { storyQueue } from '../lib/queue.js';
 import { ProjectStatus } from '@legenda/shared-types';
 
-export const pipelineRouter = Router();
+export const pipelineRouter: ReturnType<typeof Router> = Router();
 
 // POST /api/pipeline/:projectId/start
 pipelineRouter.post('/:projectId/start', async (req: Request, res: Response) => {
@@ -16,15 +16,21 @@ pipelineRouter.post('/:projectId/start', async (req: Request, res: Response) => 
   }
 
   if (project.status !== ProjectStatus.DRAFT) {
-    res.status(400).json({ success: false, error: `Pipeline already started (status: ${project.status})` });
+    res
+      .status(400)
+      .json({ success: false, error: `Pipeline already started (status: ${project.status})` });
     return;
   }
 
   // Kick off with story generation job (workers chain subsequent stages)
-  await storyQueue.add('generate-story', { projectId }, {
-    attempts: 3,
-    backoff: { type: 'exponential', delay: 5000 },
-  });
+  await storyQueue.add(
+    'generate-story',
+    { projectId },
+    {
+      attempts: 3,
+      backoff: { type: 'exponential', delay: 5000 },
+    },
+  );
 
   await prisma.project.update({
     where: { id: projectId },
@@ -41,5 +47,12 @@ pipelineRouter.get('/:projectId/status', async (req: Request, res: Response) => 
     res.status(404).json({ success: false, error: 'Project not found' });
     return;
   }
-  res.json({ success: true, data: { status: project.status, completedScenes: project.completedScenes, totalScenes: project.totalScenes } });
+  res.json({
+    success: true,
+    data: {
+      status: project.status,
+      completedScenes: project.completedScenes,
+      totalScenes: project.totalScenes,
+    },
+  });
 });

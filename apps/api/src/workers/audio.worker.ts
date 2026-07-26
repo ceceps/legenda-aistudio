@@ -12,14 +12,21 @@ export const audioWorker = new Worker<PipelineJobData>(
     const { projectId } = job.data;
 
     broadcastProgress({
-      projectId, stage: ProjectStatus.AUDIO_GENERATING, progress: 74,
-      message: 'Membuat musik & audio via Suno...', timestamp: new Date().toISOString(),
+      projectId,
+      stage: ProjectStatus.AUDIO_GENERATING,
+      progress: 74,
+      message: 'Membuat musik & audio via Suno...',
+      timestamp: new Date().toISOString(),
     });
 
     const audioAssets = await prisma.audioAsset.findMany({ where: { projectId } });
 
-    const soundtrackAsset = audioAssets.find((a) => a.type === AudioType.SOUNDTRACK);
-    const backsoundAsset = audioAssets.find((a) => a.type === AudioType.BACKSOUND);
+    const soundtrackAsset = audioAssets.find(
+      (a: { type: AudioType }) => a.type === AudioType.SOUNDTRACK,
+    );
+    const backsoundAsset = audioAssets.find(
+      (a: { type: AudioType }) => a.type === AudioType.BACKSOUND,
+    );
 
     const results: { id: string; audioUrl: string }[] = [];
 
@@ -59,7 +66,10 @@ export const audioWorker = new Worker<PipelineJobData>(
     // Update audio urls
     await Promise.all(
       results.map((r) =>
-        prisma.audioAsset.update({ where: { id: r.id }, data: { audioUrl: r.audioUrl, status: 'COMPLETED' } }),
+        prisma.audioAsset.update({
+          where: { id: r.id },
+          data: { audioUrl: r.audioUrl, status: 'COMPLETED' },
+        }),
       ),
     );
 
@@ -69,15 +79,22 @@ export const audioWorker = new Worker<PipelineJobData>(
     });
 
     broadcastProgress({
-      projectId, stage: ProjectStatus.AUDIO_DONE, progress: 80,
-      message: 'Audio selesai. Memulai render video...', timestamp: new Date().toISOString(),
+      projectId,
+      stage: ProjectStatus.AUDIO_DONE,
+      progress: 80,
+      message: 'Audio selesai. Memulai render video...',
+      timestamp: new Date().toISOString(),
     });
 
     // Chain to video
-    await storyboardQueue.add('generate-storyboard', { projectId }, {
-      attempts: 3,
-      backoff: { type: 'exponential', delay: 5000 },
-    });
+    await storyboardQueue.add(
+      'generate-storyboard',
+      { projectId },
+      {
+        attempts: 3,
+        backoff: { type: 'exponential', delay: 5000 },
+      },
+    );
 
     await prisma.project.update({
       where: { id: projectId },
@@ -92,7 +109,10 @@ audioWorker.on('failed', async (job, err) => {
   const { projectId } = job.data;
   await prisma.project.update({ where: { id: projectId }, data: { status: ProjectStatus.FAILED } });
   broadcastProgress({
-    projectId, stage: ProjectStatus.FAILED, progress: 0,
-    message: `Audio worker gagal: ${err.message}`, timestamp: new Date().toISOString(),
+    projectId,
+    stage: ProjectStatus.FAILED,
+    progress: 0,
+    message: `Audio worker gagal: ${err.message}`,
+    timestamp: new Date().toISOString(),
   });
 });

@@ -5,9 +5,12 @@ let ttsClient: googleTTS.TextToSpeechClient | null = null;
 
 function getClient(): googleTTS.TextToSpeechClient {
   if (!ttsClient) {
-    ttsClient = new googleTTS.TextToSpeechClient({
-      keyFile: process.env.GOOGLE_SERVICE_ACCOUNT_JSON,
-    });
+    const clientOptions: { keyFile?: string } = {};
+    if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
+      clientOptions.keyFile = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+    }
+
+    ttsClient = new googleTTS.TextToSpeechClient(clientOptions);
   }
   return ttsClient;
 }

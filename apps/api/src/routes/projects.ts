@@ -1,9 +1,15 @@
 import { Router, type Request, type Response } from 'express';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
-import { StoryStyle, HistoricalEra, type ApiResponse, type ProjectDTO } from '@legenda/shared-types';
+import {
+  StoryStyle,
+  HistoricalEra,
+  type ApiResponse,
+  type ProjectDTO,
+  type Screenplay,
+} from '@legenda/shared-types';
 
-export const projectsRouter = Router();
+export const projectsRouter: ReturnType<typeof Router> = Router();
 
 const CreateProjectSchema = z.object({
   ide: z.string().min(10),
@@ -17,7 +23,8 @@ const CreateProjectSchema = z.object({
 
 function toDTO(p: Awaited<ReturnType<typeof prisma.project.findUnique>>): ProjectDTO | null {
   if (!p) return null;
-  return {
+
+  const dto: ProjectDTO = {
     id: p.id,
     userId: 'anonymous',
     title: p.title,
@@ -31,7 +38,6 @@ function toDTO(p: Awaited<ReturnType<typeof prisma.project.findUnique>>): Projec
       latarDetail: p.latarDetail ?? undefined,
       plot: p.plot,
     },
-    screenplay: p.screenplay as ProjectDTO['screenplay'],
     finalVideoUrl: p.finalVideoUrl ?? undefined,
     driveFileId: p.driveFileId ?? undefined,
     driveShareLink: p.driveShareLink ?? undefined,
@@ -40,12 +46,21 @@ function toDTO(p: Awaited<ReturnType<typeof prisma.project.findUnique>>): Projec
     createdAt: p.createdAt.toISOString(),
     updatedAt: p.updatedAt.toISOString(),
   };
+
+  if (p.screenplay !== null && p.screenplay !== undefined) {
+    dto.screenplay = p.screenplay as Screenplay;
+  }
+
+  return dto;
 }
 
 // GET /api/projects
 projectsRouter.get('/', async (_req: Request, res: Response) => {
   const projects = await prisma.project.findMany({ orderBy: { createdAt: 'desc' } });
-  const data: ApiResponse<ProjectDTO[]> = { success: true, data: projects.map(toDTO).filter(Boolean) as ProjectDTO[] };
+  const data: ApiResponse<ProjectDTO[]> = {
+    success: true,
+    data: projects.map(toDTO).filter(Boolean) as ProjectDTO[],
+  };
   res.json(data);
 });
 

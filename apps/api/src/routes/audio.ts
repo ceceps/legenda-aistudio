@@ -1,7 +1,7 @@
 import { Router, type Request, type Response } from 'express';
 import { prisma } from '../lib/prisma.js';
 
-export const audioRouter = Router();
+export const audioRouter: ReturnType<typeof Router> = Router();
 
 // GET /api/projects/:id/audio
 audioRouter.get('/:id/audio', async (req: Request, res: Response) => {

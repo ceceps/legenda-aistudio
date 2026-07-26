@@ -1,0 +1,165 @@
+// This is your Prisma schema file
+// https://www.prisma.io/docs/concepts/components/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum StoryStyle {
+  KLASIK
+  SAAT_INI
+  FUTURISTIK
+  SUPER_HERO
+}
+
+enum HistoricalEra {
+  SEBELUM_MASEHI
+  MASEHI
+}
+
+enum ProjectStatus {
+  DRAFT
+  STORY_GENERATING
+  STORY_DONE
+  ASSETS_GENERATING
+  ASSETS_DONE
+  AUDIO_GENERATING
+  AUDIO_DONE
+  STORYBOARD_GENERATING
+  STORYBOARD_DONE
+  VIDEO_GENERATING
+  VIDEO_DONE
+  ASSEMBLING
+  COMPLETED
+  FAILED
+}
+
+enum AssetType {
+  CHARACTER
+  ITEM
+  BACKGROUND
+}
+
+enum AudioType {
+  SOUNDTRACK
+  BACKSOUND
+  VOICE_OVER
+}
+
+enum JobStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+// ─── Models ──────────────────────────────────────────────────────────────────
+
+model Project {
+  id              String        @id @default(uuid())
+  title           String
+  status          ProjectStatus @default(DRAFT)
+  // Master prompt inputs
+  ide             String
+  gaya            StoryStyle
+  tokohUtama      String
+  asalDaerah      String
+  latar           HistoricalEra
+  latarDetail     String?
+  plot            String
+  // Generated screenplay (stored as JSON)
+  screenplay      Json?
+  // Final output
+  finalVideoUrl   String?
+  driveFileId     String?
+  driveShareLink  String?
+  totalScenes     Int           @default(0)
+  completedScenes Int           @default(0)
+  // Relations
+  scenes          Scene[]
+  assets          Asset[]
+  audioAssets     AudioAsset[]
+  jobs            Job[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model Scene {
+  id              String    @id @default(uuid())
+  projectId       String
+  project         Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sceneNumber     Int
+  title           String
+  setting         String
+  timeOfDay       String?
+  action          String    @db.Text
+  voiceOver       String    @db.Text
+  musicMood       String?
+  actors          String[]
+  // Generation data
+  imagePrompt     String?   @db.Text
+  videoPrompt     String?   @db.Text
+  cameraAngle     String?
+  transition      String?
+  // Output URLs
+  storyboardUrl   String?
+  clipUrl         String?
+  durationSeconds Int       @default(10)
+  status          JobStatus @default(PENDING)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([projectId, sceneNumber])
+}
+
+model Asset {
+  id          String    @id @default(uuid())
+  projectId   String
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  type        AssetType
+  name        String
+  description String    @db.Text
+  imagePrompt String    @db.Text
+  imageUrl    String?
+  status      JobStatus @default(PENDING)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model AudioAsset {
+  id         String    @id @default(uuid())
+  projectId  String
+  project    Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  type       AudioType
+  sunoPrompt String    @db.Text
+  sunoJobId  String?
+  audioUrl   String?
+  lyrics     String?   @db.Text
+  mood       String?
+  genre      String?
+  status     JobStatus @default(PENDING)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model Job {
+  id        String    @id @default(uuid())
+  projectId String
+  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  type      String // 'story' | 'asset' | 'audio' | 'storyboard' | 'video' | 'assemble'
+  status    JobStatus @default(PENDING)
+  payload   Json?
+  result    Json?
+  error     String?   @db.Text
+  attempts  Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}

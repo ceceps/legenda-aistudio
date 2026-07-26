@@ -1,0 +1,1 @@
+{"version":3,"file":"drive.d.ts","sourceRoot":"","sources":["../../src/services/drive.ts"],"names":[],"mappings":"AACA,OAAO,EAAoB,KAAK,QAAQ,EAAE,MAAM,IAAI,CAAC;AAerD,wBAAsB,iBAAiB,CACrC,QAAQ,EAAE,QAAQ,EAClB,QAAQ,EAAE,MAAM,EAChB,QAAQ,EAAE,MAAM,GACf,OAAO,CAAC;IAAE,MAAM,EAAE,MAAM,CAAC;IAAC,SAAS,EAAE,MAAM,CAAA;CAAE,CAAC,CA4BhD"}
