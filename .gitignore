@@ -5,3 +5,4 @@ analisa/!.html
 .code-worspace
 .env
 !.env-example
+node_modules
