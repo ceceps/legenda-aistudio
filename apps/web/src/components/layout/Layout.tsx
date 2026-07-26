@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Film, Plus, Home } from 'lucide-react';
+import { Film, Plus, Home, FolderOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface LayoutProps {
@@ -11,8 +11,9 @@ export function Layout({ children }: LayoutProps) {
   const location = useLocation();
 
   const navItems = [
-    { href: '/', label: 'Beranda', icon: Home },
-    { href: '/create', label: 'Buat Cerita', icon: Plus },
+    { href: '/',         label: 'Beranda',       icon: Home },
+    { href: '/projects', label: 'Project Saya',  icon: FolderOpen },
+    { href: '/create',   label: 'Buat Cerita',   icon: Plus },
   ];
 
   return (

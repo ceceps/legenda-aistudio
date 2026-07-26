@@ -21,6 +21,7 @@
     "@googleapis/drive": "^8.14.0",
     "@legenda/shared-types": "workspace:*",
     "@prisma/client": "^6.1.0",
+    "@google-cloud/text-to-speech": "^5.3.0",
     "bullmq": "^5.35.0",
     "composio-core": "^0.5.6",
     "cors": "^2.8.5",
