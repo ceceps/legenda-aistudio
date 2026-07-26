@@ -1,0 +1,73 @@
+{
+  "name": "Legenda AI Studio",
+  "dockerComposeFile": "docker-compose.devcontainer.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/legenda-aistudio",
+
+  // Node 22 + common utils + Docker-in-Docker + GitHub CLI
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22",
+      "nodeGypDependencies": true
+    },
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "configureZshAsDefaultShell": true,
+      "installOhMyZsh": true,
+      "upgradePackages": true
+    }
+  },
+
+  // Install pnpm + turbo globally, then project deps
+  "postCreateCommand": "bash .devcontainer/postCreate.sh",
+
+  // Run postgres + redis containers when codespace starts
+  "postStartCommand": "docker compose -f infra/docker-compose.yml up -d postgres redis",
+
+  // Forward ports
+  "forwardPorts": [5173, 3001, 5432, 6379],
+  "portsAttributes": {
+    "5173": { "label": "Web (Vite)",      "onAutoForward": "openBrowser" },
+    "3001": { "label": "API (Express)",   "onAutoForward": "notify" },
+    "5432": { "label": "PostgreSQL",      "onAutoForward": "silent" },
+    "6379": { "label": "Redis",           "onAutoForward": "silent" }
+  },
+
+  // VS Code extensions pre-installed in Codespace
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "Prisma.prisma",
+        "bradlc.vscode-tailwindcss",
+        "ms-azuretools.vscode-docker",
+        "mtxr.sqltools",
+        "mtxr.sqltools-driver-pg",
+        "GitHub.copilot",
+        "eamodio.gitlens",
+        "ms-vscode.vscode-typescript-next",
+        "formulahendry.auto-rename-tag",
+        "christian-kohler.path-intellisense"
+      ],
+      "settings": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "editor.tabSize": 2,
+        "typescript.preferences.importModuleSpecifier": "relative",
+        "eslint.workingDirectories": [
+          { "pattern": "apps/*/" },
+          { "pattern": "packages/*/" }
+        ],
+        "tailwindCSS.experimental.classRegex": [
+          ["cn\\(([^)]*)\\)", "\"([^\"]*)\""],
+          ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
+        ]
+      }
+    }
+  },
+
+  "remoteUser": "node"
+}
