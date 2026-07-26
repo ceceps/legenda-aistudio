@@ -121,6 +121,47 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.AssetScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  type: 'type',
+  name: 'name',
+  description: 'description',
+  imagePrompt: 'imagePrompt',
+  imageUrl: 'imageUrl',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.AudioAssetScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  type: 'type',
+  sunoPrompt: 'sunoPrompt',
+  sunoJobId: 'sunoJobId',
+  audioUrl: 'audioUrl',
+  lyrics: 'lyrics',
+  mood: 'mood',
+  genre: 'genre',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.JobScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  type: 'type',
+  status: 'status',
+  payload: 'payload',
+  result: 'result',
+  error: 'error',
+  attempts: 'attempts',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.ProjectScalarFieldEnum = {
   id: 'id',
   title: 'title',
@@ -165,47 +206,6 @@ exports.Prisma.SceneScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.AssetScalarFieldEnum = {
-  id: 'id',
-  projectId: 'projectId',
-  type: 'type',
-  name: 'name',
-  description: 'description',
-  imagePrompt: 'imagePrompt',
-  imageUrl: 'imageUrl',
-  status: 'status',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.AudioAssetScalarFieldEnum = {
-  id: 'id',
-  projectId: 'projectId',
-  type: 'type',
-  sunoPrompt: 'sunoPrompt',
-  sunoJobId: 'sunoJobId',
-  audioUrl: 'audioUrl',
-  lyrics: 'lyrics',
-  mood: 'mood',
-  genre: 'genre',
-  status: 'status',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.JobScalarFieldEnum = {
-  id: 'id',
-  projectId: 'projectId',
-  type: 'type',
-  status: 'status',
-  payload: 'payload',
-  result: 'result',
-  error: 'error',
-  attempts: 'attempts',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -221,16 +221,35 @@ exports.Prisma.QueryMode = {
   insensitive: 'insensitive'
 };
 
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+
 exports.Prisma.JsonNullValueFilter = {
   DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull,
   AnyNull: Prisma.AnyNull
 };
-
-exports.Prisma.NullsOrder = {
-  first: 'first',
-  last: 'last'
+exports.AssetType = exports.$Enums.AssetType = {
+  CHARACTER: 'CHARACTER',
+  ITEM: 'ITEM',
+  BACKGROUND: 'BACKGROUND'
 };
+
+exports.JobStatus = exports.$Enums.JobStatus = {
+  PENDING: 'PENDING',
+  PROCESSING: 'PROCESSING',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED'
+};
+
+exports.AudioType = exports.$Enums.AudioType = {
+  SOUNDTRACK: 'SOUNDTRACK',
+  BACKSOUND: 'BACKSOUND',
+  VOICE_OVER: 'VOICE_OVER'
+};
+
 exports.ProjectStatus = exports.$Enums.ProjectStatus = {
   DRAFT: 'DRAFT',
   STORY_GENERATING: 'STORY_GENERATING',
@@ -260,31 +279,12 @@ exports.HistoricalEra = exports.$Enums.HistoricalEra = {
   MASEHI: 'MASEHI'
 };
 
-exports.JobStatus = exports.$Enums.JobStatus = {
-  PENDING: 'PENDING',
-  PROCESSING: 'PROCESSING',
-  COMPLETED: 'COMPLETED',
-  FAILED: 'FAILED'
-};
-
-exports.AssetType = exports.$Enums.AssetType = {
-  CHARACTER: 'CHARACTER',
-  ITEM: 'ITEM',
-  BACKGROUND: 'BACKGROUND'
-};
-
-exports.AudioType = exports.$Enums.AudioType = {
-  SOUNDTRACK: 'SOUNDTRACK',
-  BACKSOUND: 'BACKSOUND',
-  VOICE_OVER: 'VOICE_OVER'
-};
-
 exports.Prisma.ModelName = {
-  Project: 'Project',
-  Scene: 'Scene',
   Asset: 'Asset',
   AudioAsset: 'AudioAsset',
-  Job: 'Job'
+  Job: 'Job',
+  Project: 'Project',
+  Scene: 'Scene'
 };
 
 /**

@@ -93,6 +93,47 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.AssetScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  type: 'type',
+  name: 'name',
+  description: 'description',
+  imagePrompt: 'imagePrompt',
+  imageUrl: 'imageUrl',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.AudioAssetScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  type: 'type',
+  sunoPrompt: 'sunoPrompt',
+  sunoJobId: 'sunoJobId',
+  audioUrl: 'audioUrl',
+  lyrics: 'lyrics',
+  mood: 'mood',
+  genre: 'genre',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.JobScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  type: 'type',
+  status: 'status',
+  payload: 'payload',
+  result: 'result',
+  error: 'error',
+  attempts: 'attempts',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.ProjectScalarFieldEnum = {
   id: 'id',
   title: 'title',
@@ -137,47 +178,6 @@ exports.Prisma.SceneScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.AssetScalarFieldEnum = {
-  id: 'id',
-  projectId: 'projectId',
-  type: 'type',
-  name: 'name',
-  description: 'description',
-  imagePrompt: 'imagePrompt',
-  imageUrl: 'imageUrl',
-  status: 'status',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.AudioAssetScalarFieldEnum = {
-  id: 'id',
-  projectId: 'projectId',
-  type: 'type',
-  sunoPrompt: 'sunoPrompt',
-  sunoJobId: 'sunoJobId',
-  audioUrl: 'audioUrl',
-  lyrics: 'lyrics',
-  mood: 'mood',
-  genre: 'genre',
-  status: 'status',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.JobScalarFieldEnum = {
-  id: 'id',
-  projectId: 'projectId',
-  type: 'type',
-  status: 'status',
-  payload: 'payload',
-  result: 'result',
-  error: 'error',
-  attempts: 'attempts',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -193,26 +193,38 @@ exports.Prisma.QueryMode = {
   insensitive: 'insensitive'
 };
 
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+
 exports.Prisma.JsonNullValueFilter = {
   DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull,
   AnyNull: Prisma.AnyNull
 };
-
-exports.Prisma.NullsOrder = {
-  first: 'first',
-  last: 'last'
+exports.AssetType = exports.$Enums.AssetType = {
+  CHARACTER: 'CHARACTER',
+  ITEM: 'ITEM',
+  BACKGROUND: 'BACKGROUND'
 };
-exports.StoryStyle = exports.$Enums.StoryStyle = {
-  KLASIK: 'KLASIK',
-  SAAT_INI: 'SAAT_INI',
-  FUTURISTIK: 'FUTURISTIK',
-  SUPER_HERO: 'SUPER_HERO'
+
+exports.AudioType = exports.$Enums.AudioType = {
+  SOUNDTRACK: 'SOUNDTRACK',
+  BACKSOUND: 'BACKSOUND',
+  VOICE_OVER: 'VOICE_OVER'
 };
 
 exports.HistoricalEra = exports.$Enums.HistoricalEra = {
   SEBELUM_MASEHI: 'SEBELUM_MASEHI',
   MASEHI: 'MASEHI'
+};
+
+exports.JobStatus = exports.$Enums.JobStatus = {
+  PENDING: 'PENDING',
+  PROCESSING: 'PROCESSING',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED'
 };
 
 exports.ProjectStatus = exports.$Enums.ProjectStatus = {
@@ -232,31 +244,19 @@ exports.ProjectStatus = exports.$Enums.ProjectStatus = {
   FAILED: 'FAILED'
 };
 
-exports.AssetType = exports.$Enums.AssetType = {
-  CHARACTER: 'CHARACTER',
-  ITEM: 'ITEM',
-  BACKGROUND: 'BACKGROUND'
-};
-
-exports.AudioType = exports.$Enums.AudioType = {
-  SOUNDTRACK: 'SOUNDTRACK',
-  BACKSOUND: 'BACKSOUND',
-  VOICE_OVER: 'VOICE_OVER'
-};
-
-exports.JobStatus = exports.$Enums.JobStatus = {
-  PENDING: 'PENDING',
-  PROCESSING: 'PROCESSING',
-  COMPLETED: 'COMPLETED',
-  FAILED: 'FAILED'
+exports.StoryStyle = exports.$Enums.StoryStyle = {
+  KLASIK: 'KLASIK',
+  SAAT_INI: 'SAAT_INI',
+  FUTURISTIK: 'FUTURISTIK',
+  SUPER_HERO: 'SUPER_HERO'
 };
 
 exports.Prisma.ModelName = {
-  Project: 'Project',
-  Scene: 'Scene',
   Asset: 'Asset',
   AudioAsset: 'AudioAsset',
-  Job: 'Job'
+  Job: 'Job',
+  Project: 'Project',
+  Scene: 'Scene'
 };
 /**
  * Create the Client
@@ -296,6 +296,7 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
@@ -304,13 +305,13 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file\n// https://www.prisma.io/docs/concepts/components/prisma-schema\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\n// ─── Enums ───────────────────────────────────────────────────────────────────\n\nenum StoryStyle {\n  KLASIK\n  SAAT_INI\n  FUTURISTIK\n  SUPER_HERO\n}\n\nenum HistoricalEra {\n  SEBELUM_MASEHI\n  MASEHI\n}\n\nenum ProjectStatus {\n  DRAFT\n  STORY_GENERATING\n  STORY_DONE\n  ASSETS_GENERATING\n  ASSETS_DONE\n  AUDIO_GENERATING\n  AUDIO_DONE\n  STORYBOARD_GENERATING\n  STORYBOARD_DONE\n  VIDEO_GENERATING\n  VIDEO_DONE\n  ASSEMBLING\n  COMPLETED\n  FAILED\n}\n\nenum AssetType {\n  CHARACTER\n  ITEM\n  BACKGROUND\n}\n\nenum AudioType {\n  SOUNDTRACK\n  BACKSOUND\n  VOICE_OVER\n}\n\nenum JobStatus {\n  PENDING\n  PROCESSING\n  COMPLETED\n  FAILED\n}\n\n// ─── Models ──────────────────────────────────────────────────────────────────\n\nmodel Project {\n  id              String        @id @default(uuid())\n  title           String\n  status          ProjectStatus @default(DRAFT)\n  // Master prompt inputs\n  ide             String\n  gaya            StoryStyle\n  tokohUtama      String\n  asalDaerah      String\n  latar           HistoricalEra\n  latarDetail     String?\n  plot            String\n  // Generated screenplay (stored as JSON)\n  screenplay      Json?\n  // Final output\n  finalVideoUrl   String?\n  driveFileId     String?\n  driveShareLink  String?\n  totalScenes     Int           @default(0)\n  completedScenes Int           @default(0)\n  // Relations\n  scenes          Scene[]\n  assets          Asset[]\n  audioAssets     AudioAsset[]\n  jobs            Job[]\n  createdAt       DateTime      @default(now())\n  updatedAt       DateTime      @updatedAt\n}\n\nmodel Scene {\n  id              String    @id @default(uuid())\n  projectId       String\n  project         Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)\n  sceneNumber     Int\n  title           String\n  setting         String\n  timeOfDay       String?\n  action          String    @db.Text\n  voiceOver       String    @db.Text\n  musicMood       String?\n  actors          String[]\n  // Generation data\n  imagePrompt     String?   @db.Text\n  videoPrompt     String?   @db.Text\n  cameraAngle     String?\n  transition      String?\n  // Output URLs\n  storyboardUrl   String?\n  clipUrl         String?\n  durationSeconds Int       @default(10)\n  status          JobStatus @default(PENDING)\n  createdAt       DateTime  @default(now())\n  updatedAt       DateTime  @updatedAt\n\n  @@unique([projectId, sceneNumber])\n}\n\nmodel Asset {\n  id          String    @id @default(uuid())\n  projectId   String\n  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)\n  type        AssetType\n  name        String\n  description String    @db.Text\n  imagePrompt String    @db.Text\n  imageUrl    String?\n  status      JobStatus @default(PENDING)\n  createdAt   DateTime  @default(now())\n  updatedAt   DateTime  @updatedAt\n}\n\nmodel AudioAsset {\n  id         String    @id @default(uuid())\n  projectId  String\n  project    Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)\n  type       AudioType\n  sunoPrompt String    @db.Text\n  sunoJobId  String?\n  audioUrl   String?\n  lyrics     String?   @db.Text\n  mood       String?\n  genre      String?\n  status     JobStatus @default(PENDING)\n  createdAt  DateTime  @default(now())\n  updatedAt  DateTime  @updatedAt\n}\n\nmodel Job {\n  id        String    @id @default(uuid())\n  projectId String\n  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)\n  type      String // 'story' | 'asset' | 'audio' | 'storyboard' | 'video' | 'assemble'\n  status    JobStatus @default(PENDING)\n  payload   Json?\n  result    Json?\n  error     String?   @db.Text\n  attempts  Int       @default(0)\n  createdAt DateTime  @default(now())\n  updatedAt DateTime  @updatedAt\n}\n",
-  "inlineSchemaHash": "4a607ce5db696b4d3cbb43b28c0ae586a20b15b5d98d27449921e4abafde616c",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel Asset {\n  id          String    @id\n  projectId   String\n  type        AssetType\n  name        String\n  description String\n  imagePrompt String\n  imageUrl    String?\n  status      JobStatus @default(PENDING)\n  createdAt   DateTime  @default(now())\n  updatedAt   DateTime\n  Project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)\n}\n\nmodel AudioAsset {\n  id         String    @id\n  projectId  String\n  type       AudioType\n  sunoPrompt String\n  sunoJobId  String?\n  audioUrl   String?\n  lyrics     String?\n  mood       String?\n  genre      String?\n  status     JobStatus @default(PENDING)\n  createdAt  DateTime  @default(now())\n  updatedAt  DateTime\n  Project    Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)\n}\n\nmodel Job {\n  id        String    @id\n  projectId String\n  type      String\n  status    JobStatus @default(PENDING)\n  payload   Json?\n  result    Json?\n  error     String?\n  attempts  Int       @default(0)\n  createdAt DateTime  @default(now())\n  updatedAt DateTime\n  Project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)\n}\n\nmodel Project {\n  id              String        @id\n  title           String\n  status          ProjectStatus @default(DRAFT)\n  ide             String\n  gaya            StoryStyle\n  tokohUtama      String\n  asalDaerah      String\n  latar           HistoricalEra\n  latarDetail     String?\n  plot            String\n  screenplay      Json?\n  finalVideoUrl   String?\n  driveFileId     String?\n  driveShareLink  String?\n  totalScenes     Int           @default(0)\n  completedScenes Int           @default(0)\n  createdAt       DateTime      @default(now())\n  updatedAt       DateTime\n  Asset           Asset[]\n  AudioAsset      AudioAsset[]\n  Job             Job[]\n  Scene           Scene[]\n}\n\nmodel Scene {\n  id              String    @id\n  projectId       String\n  sceneNumber     Int\n  title           String\n  setting         String\n  timeOfDay       String?\n  action          String\n  voiceOver       String\n  musicMood       String?\n  actors          String[]\n  imagePrompt     String?\n  videoPrompt     String?\n  cameraAngle     String?\n  transition      String?\n  storyboardUrl   String?\n  clipUrl         String?\n  durationSeconds Int       @default(10)\n  status          JobStatus @default(PENDING)\n  createdAt       DateTime  @default(now())\n  updatedAt       DateTime\n  Project         Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)\n\n  @@unique([projectId, sceneNumber])\n}\n\nenum AssetType {\n  CHARACTER\n  ITEM\n  BACKGROUND\n}\n\nenum AudioType {\n  SOUNDTRACK\n  BACKSOUND\n  VOICE_OVER\n}\n\nenum HistoricalEra {\n  SEBELUM_MASEHI\n  MASEHI\n}\n\nenum JobStatus {\n  PENDING\n  PROCESSING\n  COMPLETED\n  FAILED\n}\n\nenum ProjectStatus {\n  DRAFT\n  STORY_GENERATING\n  STORY_DONE\n  ASSETS_GENERATING\n  ASSETS_DONE\n  AUDIO_GENERATING\n  AUDIO_DONE\n  STORYBOARD_GENERATING\n  STORYBOARD_DONE\n  VIDEO_GENERATING\n  VIDEO_DONE\n  ASSEMBLING\n  COMPLETED\n  FAILED\n}\n\nenum StoryStyle {\n  KLASIK\n  SAAT_INI\n  FUTURISTIK\n  SUPER_HERO\n}\n",
+  "inlineSchemaHash": "8b325b0ef4e3ece4f0b5e286a0b3d90ddb21ed28e709abb80e7c658bfee9c68f",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"Project\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"ProjectStatus\"},{\"name\":\"ide\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"gaya\",\"kind\":\"enum\",\"type\":\"StoryStyle\"},{\"name\":\"tokohUtama\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"asalDaerah\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"latar\",\"kind\":\"enum\",\"type\":\"HistoricalEra\"},{\"name\":\"latarDetail\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"plot\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"screenplay\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"finalVideoUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"driveFileId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"driveShareLink\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"totalScenes\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"completedScenes\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"scenes\",\"kind\":\"object\",\"type\":\"Scene\",\"relationName\":\"ProjectToScene\"},{\"name\":\"assets\",\"kind\":\"object\",\"type\":\"Asset\",\"relationName\":\"AssetToProject\"},{\"name\":\"audioAssets\",\"kind\":\"object\",\"type\":\"AudioAsset\",\"relationName\":\"AudioAssetToProject\"},{\"name\":\"jobs\",\"kind\":\"object\",\"type\":\"Job\",\"relationName\":\"JobToProject\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Scene\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"projectId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"project\",\"kind\":\"object\",\"type\":\"Project\",\"relationName\":\"ProjectToScene\"},{\"name\":\"sceneNumber\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"setting\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"timeOfDay\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"action\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"voiceOver\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"musicMood\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"actors\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"imagePrompt\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"videoPrompt\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"cameraAngle\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"transition\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"storyboardUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"clipUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"durationSeconds\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"JobStatus\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Asset\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"projectId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"project\",\"kind\":\"object\",\"type\":\"Project\",\"relationName\":\"AssetToProject\"},{\"name\":\"type\",\"kind\":\"enum\",\"type\":\"AssetType\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"imagePrompt\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"imageUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"JobStatus\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"AudioAsset\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"projectId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"project\",\"kind\":\"object\",\"type\":\"Project\",\"relationName\":\"AudioAssetToProject\"},{\"name\":\"type\",\"kind\":\"enum\",\"type\":\"AudioType\"},{\"name\":\"sunoPrompt\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"sunoJobId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"audioUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"lyrics\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"mood\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"genre\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"JobStatus\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Job\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"projectId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"project\",\"kind\":\"object\",\"type\":\"Project\",\"relationName\":\"JobToProject\"},{\"name\":\"type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"JobStatus\"},{\"name\":\"payload\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"result\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"error\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"attempts\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"Asset\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"projectId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"enum\",\"type\":\"AssetType\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"imagePrompt\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"imageUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"JobStatus\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"Project\",\"kind\":\"object\",\"type\":\"Project\",\"relationName\":\"AssetToProject\"}],\"dbName\":null},\"AudioAsset\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"projectId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"enum\",\"type\":\"AudioType\"},{\"name\":\"sunoPrompt\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"sunoJobId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"audioUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"lyrics\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"mood\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"genre\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"JobStatus\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"Project\",\"kind\":\"object\",\"type\":\"Project\",\"relationName\":\"AudioAssetToProject\"}],\"dbName\":null},\"Job\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"projectId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"JobStatus\"},{\"name\":\"payload\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"result\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"error\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"attempts\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"Project\",\"kind\":\"object\",\"type\":\"Project\",\"relationName\":\"JobToProject\"}],\"dbName\":null},\"Project\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"ProjectStatus\"},{\"name\":\"ide\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"gaya\",\"kind\":\"enum\",\"type\":\"StoryStyle\"},{\"name\":\"tokohUtama\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"asalDaerah\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"latar\",\"kind\":\"enum\",\"type\":\"HistoricalEra\"},{\"name\":\"latarDetail\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"plot\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"screenplay\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"finalVideoUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"driveFileId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"driveShareLink\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"totalScenes\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"completedScenes\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"Asset\",\"kind\":\"object\",\"type\":\"Asset\",\"relationName\":\"AssetToProject\"},{\"name\":\"AudioAsset\",\"kind\":\"object\",\"type\":\"AudioAsset\",\"relationName\":\"AudioAssetToProject\"},{\"name\":\"Job\",\"kind\":\"object\",\"type\":\"Job\",\"relationName\":\"JobToProject\"},{\"name\":\"Scene\",\"kind\":\"object\",\"type\":\"Scene\",\"relationName\":\"ProjectToScene\"}],\"dbName\":null},\"Scene\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"projectId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"sceneNumber\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"setting\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"timeOfDay\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"action\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"voiceOver\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"musicMood\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"actors\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"imagePrompt\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"videoPrompt\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"cameraAngle\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"transition\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"storyboardUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"clipUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"durationSeconds\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"JobStatus\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"Project\",\"kind\":\"object\",\"type\":\"Project\",\"relationName\":\"ProjectToScene\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = {
   getRuntime: async () => require('./query_engine_bg.js'),
