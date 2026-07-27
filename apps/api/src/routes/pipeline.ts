@@ -13,6 +13,16 @@ const RESTARTABLE_STATUSES = new Set([
   ProjectStatus.STORY_DONE,
 ]);
 
+async function drainProjectJobs(projectId: string) {
+  // Only remove non-active jobs — active jobs are stopped via AbortController
+  const jobs = await storyQueue.getJobs(['waiting', 'delayed', 'prioritized']);
+  for (const job of jobs) {
+    if (job.data.projectId === projectId) {
+      await job.remove().catch(() => {});
+    }
+  }
+}
+
 // POST /api/pipeline/:projectId/start
 pipelineRouter.post('/:projectId/start', async (req: Request, res: Response) => {
   const { projectId } = req.params;
@@ -31,27 +41,26 @@ pipelineRouter.post('/:projectId/start', async (req: Request, res: Response) => 
     return;
   }
 
-  // Abort existing run if any
+  // Abort in-flight Gemini call — worker will catch abort and mark FAILED
   abortProject(projectId);
 
-  // Drain pending story jobs for this project
-  const waiting = await storyQueue.getJobs(['waiting', 'active', 'delayed']);
-  for (const job of waiting) {
-    if (job.data.projectId === projectId) {
-      await job.remove().catch(() => {});
-    }
-  }
+  // Remove waiting/delayed jobs (active job handled by abort above)
+  await drainProjectJobs(projectId);
 
-  await storyQueue.add(
-    'generate-story',
-    { projectId },
-    { attempts: 3, backoff: { type: 'exponential', delay: 5000 } },
-  );
+  // Small delay to let active job abort and finish its failed handler
+  await new Promise((r) => setTimeout(r, 500));
 
+  // Reset project status first
   await prisma.project.update({
     where: { id: projectId },
     data: { status: ProjectStatus.STORY_GENERATING },
   });
+
+  await storyQueue.add(
+    'generate-story',
+    { projectId },
+    { attempts: 1, backoff: { type: 'exponential', delay: 5000 } },
+  );
 
   res.json({ success: true, data: { jobId: projectId, status: ProjectStatus.STORY_GENERATING } });
 });
@@ -66,16 +75,8 @@ pipelineRouter.post('/:projectId/cancel', async (req: Request, res: Response) =>
     return;
   }
 
-  // Abort in-flight Gemini calls
   abortProject(projectId);
-
-  // Remove queued jobs
-  const waiting = await storyQueue.getJobs(['waiting', 'active', 'delayed']);
-  for (const job of waiting) {
-    if (job.data.projectId === projectId) {
-      await job.remove().catch(() => {});
-    }
-  }
+  await drainProjectJobs(projectId);
 
   await prisma.project.update({
     where: { id: projectId },

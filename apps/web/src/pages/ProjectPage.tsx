@@ -13,7 +13,7 @@ type Tab = 'pipeline' | 'screenplay' | 'assets' | 'audio';
 
 export function ProjectPage() {
   const { id } = useParams<{ id: string }>();
-  const { currentProject, setCurrentProject, pipelineProgress, setLoading, isLoading } =
+  const { currentProject, setCurrentProject, pipelineProgress, resetPipelineProgress, setLoading, isLoading } =
     useProjectStore();
   const [activeTab, setActiveTab] = useState<Tab>('pipeline');
   usePipelineSocket(id ?? null);
@@ -28,16 +28,21 @@ export function ProjectPage() {
   }, [id, setCurrentProject, setLoading]);
 
   const handleStartPipeline = async () => {
-    if (!id) return;
-    await api.pipeline.start(id);
+    if (!id || !currentProject) return;
+    resetPipelineProgress();
+    setCurrentProject({ ...currentProject, status: ProjectStatus.STORY_GENERATING });
+    const res = await api.pipeline.start(id);
+    if (!res.success) {
+      // revert
+      setCurrentProject(currentProject);
+    }
   };
 
   const handleCancelPipeline = async () => {
-    if (!id) return;
+    if (!id || !currentProject) return;
     await api.pipeline.cancel(id);
-    if (currentProject) {
-      setCurrentProject({ ...currentProject, status: 'FAILED' as any });
-    }
+    resetPipelineProgress();
+    setCurrentProject({ ...currentProject, status: ProjectStatus.FAILED });
   };
 
   const project = currentProject;
@@ -53,13 +58,15 @@ export function ProjectPage() {
     ProjectStatus.ASSEMBLING,
   ].includes(project.status as ProjectStatus);
 
-  const currentStatus = pipelineProgress?.stage ?? project.status;
-  const progress = pipelineProgress?.progress
-    ?? Math.round(
-        ([...Object.values(ProjectStatus)].indexOf(project.status as ProjectStatus) /
-          (Object.values(ProjectStatus).length - 1)) * 100,
-      );
-  const message = pipelineProgress?.message ?? `Status: ${project.status}`;
+  const isTerminal = project.status === ProjectStatus.FAILED || project.status === ProjectStatus.DRAFT;
+  const effectiveProgress = isTerminal ? null : pipelineProgress;
+
+  const currentStatus = effectiveProgress?.stage ?? project.status;
+  const progress = effectiveProgress?.progress ?? (isTerminal ? 0 : Math.round(
+    ([...Object.values(ProjectStatus)].indexOf(project.status as ProjectStatus) /
+      (Object.values(ProjectStatus).length - 1)) * 100,
+  ));
+  const message = effectiveProgress?.message ?? `Status: ${project.status}`;
 
   const hasScreenplay = !!project.screenplay;
   const hasAssets = [

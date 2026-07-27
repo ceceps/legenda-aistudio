@@ -13,7 +13,7 @@ if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
 const genAI = new GoogleGenerativeAI(apiKey);
 
 const model = genAI.getGenerativeModel({
-  model: 'gemini-1.5-flash',
+  model: 'gemini-2.0-flash',
   generationConfig: { responseMimeType: 'application/json' },
 });
 
@@ -80,9 +80,13 @@ Gunakan bahasa Indonesia yang kaya dan vivid.
 `;
 
   if (signal?.aborted) throw new Error('Dibatalkan');
+  console.log('[Gemini] Calling generateContent...');
   const result = await model.generateContent(prompt);
+  console.log('[Gemini] Result:', result ? 'defined' : 'undefined', result?.response ? 'has response' : 'no response');
   if (signal?.aborted) throw new Error('Dibatalkan');
+  if (!result || !result.response) throw new Error('Gemini returned empty response');
   const text = result.response.text();
+  if (!text) throw new Error('Gemini returned empty text');
   return JSON.parse(text) as Screenplay;
 }
 
@@ -121,7 +125,9 @@ Untuk setiap scene, hasilkan JSON array StoryboardScene:
   if (signal?.aborted) throw new Error('Dibatalkan');
   const result = await model.generateContent(prompt);
   if (signal?.aborted) throw new Error('Dibatalkan');
+  if (!result || !result.response) throw new Error('Gemini returned empty response');
   const text = result.response.text();
+  if (!text) throw new Error('Gemini returned empty text');
   return JSON.parse(text) as StoryboardScene[];
 }
 
@@ -156,6 +162,8 @@ Format: [{
   if (signal?.aborted) throw new Error('Dibatalkan');
   const result = await model.generateContent(prompt);
   if (signal?.aborted) throw new Error('Dibatalkan');
+  if (!result.response) throw new Error('Gemini returned empty response');
   const text = result.response.text();
+  if (!text) throw new Error('Gemini returned empty text');
   return JSON.parse(text) as AudioPrompt[];
 }

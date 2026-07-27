@@ -10,6 +10,7 @@ interface ProjectStore {
   setProjects: (projects: ProjectDTO[]) => void;
   setCurrentProject: (project: ProjectDTO | null) => void;
   setPipelineProgress: (event: PipelineProgressEvent) => void;
+  resetPipelineProgress: () => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   updateProjectInList: (project: ProjectDTO) => void;
@@ -24,6 +25,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
   setProjects: (projects) => set({ projects }),
   setCurrentProject: (project) => set({ currentProject: project }),
   setPipelineProgress: (event) => set({ pipelineProgress: event }),
+  resetPipelineProgress: () => set({ pipelineProgress: null }),
   setLoading: (isLoading) => set({ isLoading }),
   setError: (error) => set({ error }),
   updateProjectInList: (project) =>
@@ -32,3 +34,4 @@ export const useProjectStore = create<ProjectStore>((set) => ({
       currentProject: state.currentProject?.id === project.id ? project : state.currentProject,
     })),
 }));
+
