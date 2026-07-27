@@ -64,6 +64,7 @@ model Project {
   latarDetail     String?
   plot            String
   screenplay      Json?
+  storygenerate   String?       @db.Text
   finalVideoUrl   String?
   driveFileId     String?
   driveShareLink  String?

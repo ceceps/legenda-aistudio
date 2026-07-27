@@ -4831,6 +4831,7 @@ export namespace Prisma {
     latar: $Enums.HistoricalEra | null
     latarDetail: string | null
     plot: string | null
+    storygenerate: string | null
     finalVideoUrl: string | null
     driveFileId: string | null
     driveShareLink: string | null
@@ -4851,6 +4852,7 @@ export namespace Prisma {
     latar: $Enums.HistoricalEra | null
     latarDetail: string | null
     plot: string | null
+    storygenerate: string | null
     finalVideoUrl: string | null
     driveFileId: string | null
     driveShareLink: string | null
@@ -4872,6 +4874,7 @@ export namespace Prisma {
     latarDetail: number
     plot: number
     screenplay: number
+    storygenerate: number
     finalVideoUrl: number
     driveFileId: number
     driveShareLink: number
@@ -4904,6 +4907,7 @@ export namespace Prisma {
     latar?: true
     latarDetail?: true
     plot?: true
+    storygenerate?: true
     finalVideoUrl?: true
     driveFileId?: true
     driveShareLink?: true
@@ -4924,6 +4928,7 @@ export namespace Prisma {
     latar?: true
     latarDetail?: true
     plot?: true
+    storygenerate?: true
     finalVideoUrl?: true
     driveFileId?: true
     driveShareLink?: true
@@ -4945,6 +4950,7 @@ export namespace Prisma {
     latarDetail?: true
     plot?: true
     screenplay?: true
+    storygenerate?: true
     finalVideoUrl?: true
     driveFileId?: true
     driveShareLink?: true
@@ -5053,6 +5059,7 @@ export namespace Prisma {
     latarDetail: string | null
     plot: string
     screenplay: JsonValue | null
+    storygenerate: string | null
     finalVideoUrl: string | null
     driveFileId: string | null
     driveShareLink: string | null
@@ -5093,6 +5100,7 @@ export namespace Prisma {
     latarDetail?: boolean
     plot?: boolean
     screenplay?: boolean
+    storygenerate?: boolean
     finalVideoUrl?: boolean
     driveFileId?: boolean
     driveShareLink?: boolean
@@ -5119,6 +5127,7 @@ export namespace Prisma {
     latarDetail?: boolean
     plot?: boolean
     screenplay?: boolean
+    storygenerate?: boolean
     finalVideoUrl?: boolean
     driveFileId?: boolean
     driveShareLink?: boolean
@@ -5140,6 +5149,7 @@ export namespace Prisma {
     latarDetail?: boolean
     plot?: boolean
     screenplay?: boolean
+    storygenerate?: boolean
     finalVideoUrl?: boolean
     driveFileId?: boolean
     driveShareLink?: boolean
@@ -5161,6 +5171,7 @@ export namespace Prisma {
     latarDetail?: boolean
     plot?: boolean
     screenplay?: boolean
+    storygenerate?: boolean
     finalVideoUrl?: boolean
     driveFileId?: boolean
     driveShareLink?: boolean
@@ -5170,7 +5181,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "status" | "ide" | "gaya" | "tokohUtama" | "asalDaerah" | "latar" | "latarDetail" | "plot" | "screenplay" | "finalVideoUrl" | "driveFileId" | "driveShareLink" | "totalScenes" | "completedScenes" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
+  export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "status" | "ide" | "gaya" | "tokohUtama" | "asalDaerah" | "latar" | "latarDetail" | "plot" | "screenplay" | "storygenerate" | "finalVideoUrl" | "driveFileId" | "driveShareLink" | "totalScenes" | "completedScenes" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
   export type ProjectInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     Asset?: boolean | Project$AssetArgs<ExtArgs>
     AudioAsset?: boolean | Project$AudioAssetArgs<ExtArgs>
@@ -5201,6 +5212,7 @@ export namespace Prisma {
       latarDetail: string | null
       plot: string
       screenplay: Prisma.JsonValue | null
+      storygenerate: string | null
       finalVideoUrl: string | null
       driveFileId: string | null
       driveShareLink: string | null
@@ -5646,6 +5658,7 @@ export namespace Prisma {
     readonly latarDetail: FieldRef<"Project", 'String'>
     readonly plot: FieldRef<"Project", 'String'>
     readonly screenplay: FieldRef<"Project", 'Json'>
+    readonly storygenerate: FieldRef<"Project", 'String'>
     readonly finalVideoUrl: FieldRef<"Project", 'String'>
     readonly driveFileId: FieldRef<"Project", 'String'>
     readonly driveShareLink: FieldRef<"Project", 'String'>
@@ -7518,6 +7531,7 @@ export namespace Prisma {
     latarDetail: 'latarDetail',
     plot: 'plot',
     screenplay: 'screenplay',
+    storygenerate: 'storygenerate',
     finalVideoUrl: 'finalVideoUrl',
     driveFileId: 'driveFileId',
     driveShareLink: 'driveShareLink',
@@ -8026,6 +8040,7 @@ export namespace Prisma {
     latarDetail?: StringNullableFilter<"Project"> | string | null
     plot?: StringFilter<"Project"> | string
     screenplay?: JsonNullableFilter<"Project">
+    storygenerate?: StringNullableFilter<"Project"> | string | null
     finalVideoUrl?: StringNullableFilter<"Project"> | string | null
     driveFileId?: StringNullableFilter<"Project"> | string | null
     driveShareLink?: StringNullableFilter<"Project"> | string | null
@@ -8051,6 +8066,7 @@ export namespace Prisma {
     latarDetail?: SortOrderInput | SortOrder
     plot?: SortOrder
     screenplay?: SortOrderInput | SortOrder
+    storygenerate?: SortOrderInput | SortOrder
     finalVideoUrl?: SortOrderInput | SortOrder
     driveFileId?: SortOrderInput | SortOrder
     driveShareLink?: SortOrderInput | SortOrder
@@ -8079,6 +8095,7 @@ export namespace Prisma {
     latarDetail?: StringNullableFilter<"Project"> | string | null
     plot?: StringFilter<"Project"> | string
     screenplay?: JsonNullableFilter<"Project">
+    storygenerate?: StringNullableFilter<"Project"> | string | null
     finalVideoUrl?: StringNullableFilter<"Project"> | string | null
     driveFileId?: StringNullableFilter<"Project"> | string | null
     driveShareLink?: StringNullableFilter<"Project"> | string | null
@@ -8104,6 +8121,7 @@ export namespace Prisma {
     latarDetail?: SortOrderInput | SortOrder
     plot?: SortOrder
     screenplay?: SortOrderInput | SortOrder
+    storygenerate?: SortOrderInput | SortOrder
     finalVideoUrl?: SortOrderInput | SortOrder
     driveFileId?: SortOrderInput | SortOrder
     driveShareLink?: SortOrderInput | SortOrder
@@ -8133,6 +8151,7 @@ export namespace Prisma {
     latarDetail?: StringNullableWithAggregatesFilter<"Project"> | string | null
     plot?: StringWithAggregatesFilter<"Project"> | string
     screenplay?: JsonNullableWithAggregatesFilter<"Project">
+    storygenerate?: StringNullableWithAggregatesFilter<"Project"> | string | null
     finalVideoUrl?: StringNullableWithAggregatesFilter<"Project"> | string | null
     driveFileId?: StringNullableWithAggregatesFilter<"Project"> | string | null
     driveShareLink?: StringNullableWithAggregatesFilter<"Project"> | string | null
@@ -8571,6 +8590,7 @@ export namespace Prisma {
     latarDetail?: string | null
     plot: string
     screenplay?: NullableJsonNullValueInput | InputJsonValue
+    storygenerate?: string | null
     finalVideoUrl?: string | null
     driveFileId?: string | null
     driveShareLink?: string | null
@@ -8596,6 +8616,7 @@ export namespace Prisma {
     latarDetail?: string | null
     plot: string
     screenplay?: NullableJsonNullValueInput | InputJsonValue
+    storygenerate?: string | null
     finalVideoUrl?: string | null
     driveFileId?: string | null
     driveShareLink?: string | null
@@ -8621,6 +8642,7 @@ export namespace Prisma {
     latarDetail?: NullableStringFieldUpdateOperationsInput | string | null
     plot?: StringFieldUpdateOperationsInput | string
     screenplay?: NullableJsonNullValueInput | InputJsonValue
+    storygenerate?: NullableStringFieldUpdateOperationsInput | string | null
     finalVideoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     driveFileId?: NullableStringFieldUpdateOperationsInput | string | null
     driveShareLink?: NullableStringFieldUpdateOperationsInput | string | null
@@ -8646,6 +8668,7 @@ export namespace Prisma {
     latarDetail?: NullableStringFieldUpdateOperationsInput | string | null
     plot?: StringFieldUpdateOperationsInput | string
     screenplay?: NullableJsonNullValueInput | InputJsonValue
+    storygenerate?: NullableStringFieldUpdateOperationsInput | string | null
     finalVideoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     driveFileId?: NullableStringFieldUpdateOperationsInput | string | null
     driveShareLink?: NullableStringFieldUpdateOperationsInput | string | null
@@ -8671,6 +8694,7 @@ export namespace Prisma {
     latarDetail?: string | null
     plot: string
     screenplay?: NullableJsonNullValueInput | InputJsonValue
+    storygenerate?: string | null
     finalVideoUrl?: string | null
     driveFileId?: string | null
     driveShareLink?: string | null
@@ -8692,6 +8716,7 @@ export namespace Prisma {
     latarDetail?: NullableStringFieldUpdateOperationsInput | string | null
     plot?: StringFieldUpdateOperationsInput | string
     screenplay?: NullableJsonNullValueInput | InputJsonValue
+    storygenerate?: NullableStringFieldUpdateOperationsInput | string | null
     finalVideoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     driveFileId?: NullableStringFieldUpdateOperationsInput | string | null
     driveShareLink?: NullableStringFieldUpdateOperationsInput | string | null
@@ -8713,6 +8738,7 @@ export namespace Prisma {
     latarDetail?: NullableStringFieldUpdateOperationsInput | string | null
     plot?: StringFieldUpdateOperationsInput | string
     screenplay?: NullableJsonNullValueInput | InputJsonValue
+    storygenerate?: NullableStringFieldUpdateOperationsInput | string | null
     finalVideoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     driveFileId?: NullableStringFieldUpdateOperationsInput | string | null
     driveShareLink?: NullableStringFieldUpdateOperationsInput | string | null
@@ -9310,6 +9336,7 @@ export namespace Prisma {
     latarDetail?: SortOrder
     plot?: SortOrder
     screenplay?: SortOrder
+    storygenerate?: SortOrder
     finalVideoUrl?: SortOrder
     driveFileId?: SortOrder
     driveShareLink?: SortOrder
@@ -9335,6 +9362,7 @@ export namespace Prisma {
     latar?: SortOrder
     latarDetail?: SortOrder
     plot?: SortOrder
+    storygenerate?: SortOrder
     finalVideoUrl?: SortOrder
     driveFileId?: SortOrder
     driveShareLink?: SortOrder
@@ -9355,6 +9383,7 @@ export namespace Prisma {
     latar?: SortOrder
     latarDetail?: SortOrder
     plot?: SortOrder
+    storygenerate?: SortOrder
     finalVideoUrl?: SortOrder
     driveFileId?: SortOrder
     driveShareLink?: SortOrder
@@ -10039,6 +10068,7 @@ export namespace Prisma {
     latarDetail?: string | null
     plot: string
     screenplay?: NullableJsonNullValueInput | InputJsonValue
+    storygenerate?: string | null
     finalVideoUrl?: string | null
     driveFileId?: string | null
     driveShareLink?: string | null
@@ -10063,6 +10093,7 @@ export namespace Prisma {
     latarDetail?: string | null
     plot: string
     screenplay?: NullableJsonNullValueInput | InputJsonValue
+    storygenerate?: string | null
     finalVideoUrl?: string | null
     driveFileId?: string | null
     driveShareLink?: string | null
@@ -10103,6 +10134,7 @@ export namespace Prisma {
     latarDetail?: NullableStringFieldUpdateOperationsInput | string | null
     plot?: StringFieldUpdateOperationsInput | string
     screenplay?: NullableJsonNullValueInput | InputJsonValue
+    storygenerate?: NullableStringFieldUpdateOperationsInput | string | null
     finalVideoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     driveFileId?: NullableStringFieldUpdateOperationsInput | string | null
     driveShareLink?: NullableStringFieldUpdateOperationsInput | string | null
@@ -10127,6 +10159,7 @@ export namespace Prisma {
     latarDetail?: NullableStringFieldUpdateOperationsInput | string | null
     plot?: StringFieldUpdateOperationsInput | string
     screenplay?: NullableJsonNullValueInput | InputJsonValue
+    storygenerate?: NullableStringFieldUpdateOperationsInput | string | null
     finalVideoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     driveFileId?: NullableStringFieldUpdateOperationsInput | string | null
     driveShareLink?: NullableStringFieldUpdateOperationsInput | string | null
@@ -10151,6 +10184,7 @@ export namespace Prisma {
     latarDetail?: string | null
     plot: string
     screenplay?: NullableJsonNullValueInput | InputJsonValue
+    storygenerate?: string | null
     finalVideoUrl?: string | null
     driveFileId?: string | null
     driveShareLink?: string | null
@@ -10175,6 +10209,7 @@ export namespace Prisma {
     latarDetail?: string | null
     plot: string
     screenplay?: NullableJsonNullValueInput | InputJsonValue
+    storygenerate?: string | null
     finalVideoUrl?: string | null
     driveFileId?: string | null
     driveShareLink?: string | null
@@ -10215,6 +10250,7 @@ export namespace Prisma {
     latarDetail?: NullableStringFieldUpdateOperationsInput | string | null
     plot?: StringFieldUpdateOperationsInput | string
     screenplay?: NullableJsonNullValueInput | InputJsonValue
+    storygenerate?: NullableStringFieldUpdateOperationsInput | string | null
     finalVideoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     driveFileId?: NullableStringFieldUpdateOperationsInput | string | null
     driveShareLink?: NullableStringFieldUpdateOperationsInput | string | null
@@ -10239,6 +10275,7 @@ export namespace Prisma {
     latarDetail?: NullableStringFieldUpdateOperationsInput | string | null
     plot?: StringFieldUpdateOperationsInput | string
     screenplay?: NullableJsonNullValueInput | InputJsonValue
+    storygenerate?: NullableStringFieldUpdateOperationsInput | string | null
     finalVideoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     driveFileId?: NullableStringFieldUpdateOperationsInput | string | null
     driveShareLink?: NullableStringFieldUpdateOperationsInput | string | null
@@ -10263,6 +10300,7 @@ export namespace Prisma {
     latarDetail?: string | null
     plot: string
     screenplay?: NullableJsonNullValueInput | InputJsonValue
+    storygenerate?: string | null
     finalVideoUrl?: string | null
     driveFileId?: string | null
     driveShareLink?: string | null
@@ -10287,6 +10325,7 @@ export namespace Prisma {
     latarDetail?: string | null
     plot: string
     screenplay?: NullableJsonNullValueInput | InputJsonValue
+    storygenerate?: string | null
     finalVideoUrl?: string | null
     driveFileId?: string | null
     driveShareLink?: string | null
@@ -10327,6 +10366,7 @@ export namespace Prisma {
     latarDetail?: NullableStringFieldUpdateOperationsInput | string | null
     plot?: StringFieldUpdateOperationsInput | string
     screenplay?: NullableJsonNullValueInput | InputJsonValue
+    storygenerate?: NullableStringFieldUpdateOperationsInput | string | null
     finalVideoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     driveFileId?: NullableStringFieldUpdateOperationsInput | string | null
     driveShareLink?: NullableStringFieldUpdateOperationsInput | string | null
@@ -10351,6 +10391,7 @@ export namespace Prisma {
     latarDetail?: NullableStringFieldUpdateOperationsInput | string | null
     plot?: StringFieldUpdateOperationsInput | string
     screenplay?: NullableJsonNullValueInput | InputJsonValue
+    storygenerate?: NullableStringFieldUpdateOperationsInput | string | null
     finalVideoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     driveFileId?: NullableStringFieldUpdateOperationsInput | string | null
     driveShareLink?: NullableStringFieldUpdateOperationsInput | string | null
@@ -10675,6 +10716,7 @@ export namespace Prisma {
     latarDetail?: string | null
     plot: string
     screenplay?: NullableJsonNullValueInput | InputJsonValue
+    storygenerate?: string | null
     finalVideoUrl?: string | null
     driveFileId?: string | null
     driveShareLink?: string | null
@@ -10699,6 +10741,7 @@ export namespace Prisma {
     latarDetail?: string | null
     plot: string
     screenplay?: NullableJsonNullValueInput | InputJsonValue
+    storygenerate?: string | null
     finalVideoUrl?: string | null
     driveFileId?: string | null
     driveShareLink?: string | null
@@ -10739,6 +10782,7 @@ export namespace Prisma {
     latarDetail?: NullableStringFieldUpdateOperationsInput | string | null
     plot?: StringFieldUpdateOperationsInput | string
     screenplay?: NullableJsonNullValueInput | InputJsonValue
+    storygenerate?: NullableStringFieldUpdateOperationsInput | string | null
     finalVideoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     driveFileId?: NullableStringFieldUpdateOperationsInput | string | null
     driveShareLink?: NullableStringFieldUpdateOperationsInput | string | null
@@ -10763,6 +10807,7 @@ export namespace Prisma {
     latarDetail?: NullableStringFieldUpdateOperationsInput | string | null
     plot?: StringFieldUpdateOperationsInput | string
     screenplay?: NullableJsonNullValueInput | InputJsonValue
+    storygenerate?: NullableStringFieldUpdateOperationsInput | string | null
     finalVideoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     driveFileId?: NullableStringFieldUpdateOperationsInput | string | null
     driveShareLink?: NullableStringFieldUpdateOperationsInput | string | null

@@ -10,6 +10,7 @@ import { pipelineRouter } from './routes/pipeline.js';
 import { storyboardRouter } from './routes/storyboard.js';
 import { assetsRouter } from './routes/assets.js';
 import { audioRouter } from './routes/audio.js';
+import { storyRouter } from './routes/story.js';
 import { checkGoogleServicesHealth, getGoogleServiceMode } from './services/google-unified.js';
 
 // ── Register all workers (starts listening to queues) ────────────────────────
@@ -34,6 +35,7 @@ app.use('/api/projects', projectsRouter);
 app.use('/api/projects', storyboardRouter);
 app.use('/api/projects', assetsRouter);
 app.use('/api/projects', audioRouter);
+app.use('/api/story', storyRouter);
 app.use('/api/pipeline', pipelineRouter);
 
 app.get('/api/health', (_req, res) => {

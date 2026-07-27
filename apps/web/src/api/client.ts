@@ -1,4 +1,4 @@
-import { type ProjectDTO, type MasterPromptInput, type ApiResponse } from '@legenda/shared-types';
+import { type ProjectDTO, type MasterPromptInput, type ApiResponse, type Screenplay } from '@legenda/shared-types';
 
 const API_BASE = '/api';
 
@@ -17,6 +17,13 @@ export const api = {
     create: (data: MasterPromptInput) =>
       request<ProjectDTO>('/projects', { method: 'POST', body: JSON.stringify(data) }),
     delete: (id: string) => request<void>(`/projects/${id}`, { method: 'DELETE' }),
+  },
+  story: {
+    generate: (data: MasterPromptInput & { projectId?: string }) =>
+      request<{ screenplay: Screenplay; markdown: string }>('/story/generate', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
   },
   pipeline: {
     start: (projectId: string) =>

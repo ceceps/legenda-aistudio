@@ -1,8 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { StoryStyle, HistoricalEra, ProjectStatus, type MasterPromptInput } from '@legenda/shared-types';
+import { StoryStyle, HistoricalEra, ProjectStatus, type MasterPromptInput, type Screenplay } from '@legenda/shared-types';
 import { api } from '@/api/client';
 import { useProjectStore } from '@/store/projectStore';
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
 import { PipelineProgress } from '@/components/pipeline/PipelineProgress';
 
 const GAYA_OPTIONS: { value: StoryStyle; label: string }[] = [
@@ -35,42 +37,14 @@ export function CreatePage() {
   const [pipelineProgress, setPipelineProgress] = useState(0);
   const [pipelineMessage, setPipelineMessage] = useState('Siap memproses...');
   const [projectId, setProjectId] = useState<string | null>(null);
-  const wsRef = useRef<WebSocket | null>(null);
-
-  // Connect WS setelah project dibuat, tunggu sampai COMPLETED/FAILED
-  useEffect(() => {
-    if (!projectId) return;
-
-    const ws = new WebSocket(`ws://${window.location.host}/ws?projectId=${projectId}`);
-    wsRef.current = ws;
-
-    ws.onopen = () => {
-      setPipelineMessage('Terhubung — pipeline berjalan...');
-    };
-
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data as string);
-      setPipelineStatus(data.stage);
-      setPipelineProgress(data.progress ?? 0);
-      setPipelineMessage(data.message ?? '');
-
-      if (data.stage === ProjectStatus.COMPLETED) {
-        ws.close();
-        setLoading(false);
-        navigate(`/project/${projectId}`);
-      } else if (data.stage === 'FAILED') {
-        ws.close();
-        setLoading(false);
-        setError('Pipeline gagal. Coba lagi.');
-      }
-    };
-
-    ws.onerror = () => {
-      setPipelineMessage('WebSocket error — pipeline tetap berjalan di server.');
-    };
-
-    return () => ws.close();
-  }, [projectId]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [generatedMarkdown, setGeneratedMarkdown] = useState<string>('');
+  const [showEditor, setShowEditor] = useState(false);
+  const [generationStep, setGenerationStep] = useState<'idle' | 'generating' | 'complete' | 'error'>('idle');
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: '<p>Hasil cerita AI akan muncul di sini setelah generate...</p>',
+    editable: false,
+  });
 
   const set = <K extends keyof MasterPromptInput>(key: K, value: MasterPromptInput[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -79,25 +53,70 @@ export function CreatePage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setGenerationStep('generating');
     setPipelineStatus(ProjectStatus.STORY_GENERATING);
-    setPipelineProgress(5);
+    setPipelineProgress(10);
     setPipelineMessage('Membuat project...');
 
-    const res = await api.projects.create(form);
+    try {
+      // 1. Create project first
+      const projectRes = await api.projects.create(form);
+      if (!projectRes.success || !projectRes.data) {
+        throw new Error(projectRes.error ?? 'Gagal membuat project');
+      }
 
-    if (res.success && res.data) {
-      setCurrentProject(res.data);
-      setProjectId(res.data.id); // trigger useEffect → WS connect
-    } else {
+      const project = projectRes.data;
+      setCurrentProject(project);
+      setProjectId(project.id);
+      setPipelineProgress(20);
+      setPipelineMessage('Project dibuat. Menghubungkan ke Gemini AI...');
+
+      // 2. Generate story directly via API (no worker, no WS)
+      setPipelineProgress(30);
+      setPipelineMessage('Menghubungi Gemini AI...');
+
+      const storyRes = await api.story.generate({ ...form, projectId: project.id });
+
+      if (!storyRes.success || !storyRes.data) {
+        throw new Error(storyRes.error ?? 'Gagal generate story');
+      }
+
+      setPipelineProgress(60);
+      setPipelineMessage('Hasil diterima. Menyiapkan editor...');
+
+      // 3. Save markdown to state for TipTap
+      const markdown = storyRes.data.markdown;
+      setGeneratedMarkdown(markdown);
+      setShowEditor(true);
+
+      // Convert markdown to HTML for TipTap
+      const html = markdownToHtml(markdown);
+      if (editor) {
+        editor.commands.setContent(html);
+      }
+
+      // 4. Complete
+      setPipelineStatus(ProjectStatus.STORY_DONE);
+      setPipelineProgress(100);
+      setPipelineMessage('Generate story selesai! Silakan review di editor.');
+      setGenerationStep('complete');
       setLoading(false);
-      setPipelineStatus(ProjectStatus.DRAFT);
+
+      // Optionally navigate to project page after a delay
+      setTimeout(() => {
+        navigate(`/project/${project.id}`);
+      }, 1500);
+    } catch (err: any) {
+      setPipelineStatus(ProjectStatus.FAILED);
       setPipelineProgress(0);
       setPipelineMessage('Gagal memproses.');
-      setError(res.error ?? 'Gagal membuat project');
+      setGenerationStep('error');
+      setError(err.message);
+      setLoading(false);
     }
   };
 
-  const isRunning = isLoading || (pipelineProgress > 0 && pipelineProgress < 100);
+  const isFormDisabled = isLoading || generationStep === 'generating';
 
   return (
     <div className="flex gap-6 min-h-[calc(100vh-80px)]">
@@ -106,11 +125,11 @@ export function CreatePage() {
         <div className="page-card p-6 h-full">
           <h1 className="text-2xl font-bold mb-1">Buat Cerita Baru</h1>
           <p className="text-sm text-muted-foreground mb-6">
-            Isi prompt cerita, lalu klik Generate. Progress pipeline akan tampil di kanan.
+            Isi prompt cerita, lalu klik Generate. Progress akan tampil di kanan.
           </p>
 
           <fieldset
-            disabled={isRunning}
+            disabled={isFormDisabled}
             className="space-y-5 disabled:opacity-60 disabled:pointer-events-none transition-opacity"
           >
             <Field label="Ide Cerita" required>
@@ -201,37 +220,76 @@ export function CreatePage() {
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={isRunning}
+              disabled={isFormDisabled}
               className="rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-50"
             >
-              {isRunning ? 'Memproses...' : '✨ Generate Cerita'}
+              {generationStep === 'generating' ? 'Memproses...' : '✨ Generate Cerita'}
             </button>
           </div>
+
+          {/* Response message below button */}
+          {pipelineMessage && (
+            <div className={`mt-4 p-3 rounded-xl text-sm transition-all ${
+              generationStep === 'error'
+                ? 'bg-red-50 text-red-700 border border-red-200'
+                : generationStep === 'complete'
+                ? 'bg-green-50 text-green-700 border border-green-200'
+                : 'bg-blue-50 text-blue-700 border border-blue-200'
+            }`}>
+              <div className="flex items-center gap-2">
+                <span className="font-medium">
+                  {generationStep === 'error'
+                    ? '❌ Error'
+                    : generationStep === 'complete'
+                    ? '✅ Selesai'
+                    : '⏳ Proses...'}
+                </span>
+              </div>
+              <div className="mt-1 text-sm">
+                {simplifyMessage(pipelineMessage)}
+              </div>
+            </div>
+          )}
         </div>
       </aside>
 
-      {/* ── Panel Kanan: Pipeline ── */}
+      {/* ── Panel Kanan: Progress + Editor ── */}
       <section className="flex-1">
-        <div className="page-card p-6 h-full">
-          <div className="mb-5">
-            <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Status</p>
-            <h2 className="text-xl font-semibold">Pipeline Produksi</h2>
+        <div className="page-card p-6 h-full flex flex-col">
+          {/* Progress Section */}
+          <div className="mb-5 flex-shrink-0">
+            <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Progres Live</p>
+            <h2 className="text-xl font-semibold">Generate Story</h2>
           </div>
 
-          {pipelineProgress === 0 ? (
-            <div className="flex flex-col items-center justify-center h-[60%] text-center gap-3 text-muted-foreground">
-              <span className="text-4xl">🎬</span>
-              <p className="text-sm">
-                Pipeline akan berjalan setelah kamu klik <strong>Generate Cerita</strong>.
-              </p>
+          <div className="flex-1 flex flex-col gap-4">
+            {/* Section 1: Progress */}
+            <div className="shrink-0">
+              <PipelineProgress
+                currentStatus={generationStep === 'generating' ? ProjectStatus.STORY_GENERATING : ProjectStatus.DRAFT}
+                progress={pipelineProgress}
+                message={pipelineMessage}
+              />
             </div>
-          ) : (
-            <PipelineProgress
-              currentStatus={pipelineStatus}
-              progress={pipelineProgress}
-              message={pipelineMessage}
-            />
-          )}
+
+            {/* Section 2: TipTap Editor (show when done) */}
+            {showEditor && generatedMarkdown && (
+              <div className="flex-1 border rounded-3xl bg-background overflow-hidden flex flex-col">
+                <div className="p-3 border-b bg-muted/30 flex items-center justify-between">
+                  <h3 className="font-semibold text-sm">Hasil Generate Story (Markdown Preview)</h3>
+                  <button
+                    onClick={() => navigator.clipboard.writeText(generatedMarkdown)}
+                    className="text-xs text-primary hover:underline"
+                  >
+                    Copy Markdown
+                  </button>
+                </div>
+                <div className="flex-1 p-4 overflow-y-auto prose max-w-none">
+                  <MarkdownRenderer markdown={generatedMarkdown} />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </section>
     </div>
@@ -255,4 +313,46 @@ function Field({
       {children}
     </div>
   );
+}
+
+// Simple markdown renderer for preview
+function MarkdownRenderer({ markdown }: { markdown: string }) {
+  const html = markdown
+    .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+    .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+    .replace(/\n\n/gim, '</p><p>')
+    .replace(/\n/gim, '<br/>')
+    .replace(/^/, '<p>')
+    .replace(/$/, '</p>');
+
+  return <div dangerouslySetInnerHTML={{ __html: html }} />;
+}
+
+function simplifyMessage(message: string): string {
+  // Extract key info from long technical messages
+  if (message.includes('Gemini') || message.includes('generativelanguage')) {
+    return 'Menghubungi AI...';
+  }
+  if (message.includes('Membuat project')) return 'Membuat project...';
+  if (message.includes('Menghubungkan')) return 'Menghubungkan ke AI...';
+  if (message.includes('Menyimpan')) return 'Menyimpan hasil...';
+  if (message.includes('Selesai')) return 'Generate story selesai!';
+  if (message.includes('Error') || message.includes('Gagal')) return message;
+  return message.length > 60 ? message.slice(0, 60) + '...' : message;
+}
+
+function markdownToHtml(markdown: string): string {
+  return markdown
+    .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+    .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+    .replace(/\n\n/gim, '</p><p>')
+    .replace(/\n/gim, '<br/>')
+    .replace(/^/, '<p>')
+    .replace(/$/, '</p>');
 }
