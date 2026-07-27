@@ -1,6 +1,7 @@
 import { type AudioPrompt, AudioType } from '@legenda/shared-types';
+import OpenAI from "openai";
 
-const SUNO_API_BASE = 'https://api.suno.ai/v1'; // update if official endpoint changes
+const SUNO_API_BASE = `${process.env.AIRFORCE_BASE_URL ?? 'https://api.airforce/v1'}`; // update if official endpoint changes
 
 interface SunoGenerateRequest {
   prompt: string;
@@ -19,11 +20,16 @@ interface SunoJobResponse {
 }
 
 async function sunoFetch(path: string, body: object): Promise<SunoJobResponse> {
+ 
+const client = new OpenAI({ baseURL: SUNO_API_BASE, apiKey: process.env.AIRFORCE_API_KEY });
+const img = await client.images.generate({ model: "suno-v4.5", prompt: "a red panda coding" });
+console.log(img.data[0].url);
+
   const res = await fetch(`${SUNO_API_BASE}${path}`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.SUNO_API_KEY ?? ''}`,
+      "Accept": 'application/json',      'Content-Type': 'application/json',
+      Authorization: `Bearer ${process.env.KEI_API_KEY ?? ''}`,
     },
     body: JSON.stringify(body),
   });

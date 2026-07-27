@@ -174,6 +174,7 @@ exports.Prisma.ProjectScalarFieldEnum = {
   latarDetail: 'latarDetail',
   plot: 'plot',
   screenplay: 'screenplay',
+  storygenerate: 'storygenerate',
   finalVideoUrl: 'finalVideoUrl',
   driveFileId: 'driveFileId',
   driveShareLink: 'driveShareLink',

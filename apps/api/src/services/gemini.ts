@@ -13,7 +13,7 @@ if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
 const genAI = new GoogleGenerativeAI(apiKey);
 
 const model = genAI.getGenerativeModel({
-  model: 'gemini-2.0-flash',
+  model: 'gemini-2.5-flash',
   generationConfig: { responseMimeType: 'application/json' },
 });
 
@@ -52,11 +52,16 @@ export async function generateScreenplay(
   };
 
   const prompt = `
-Kamu adalah penulis naskah cerita terbaik Indonesia.
+**Persona Layer:**
+Kamu adalah script doctor profesional yang mengkhususkan diri pada
+reinterpretasi cerita rakyat Nusantara dengan sudut pandang modern,
+tanpa menghilangkan nilai budaya aslinya.
+
+**Instruction Layer:**
 Buatkan naskah cerita lengkap berdasarkan master prompt berikut:
 
 IDE: "${input.ide}"
-GAYA: ${styleMap[input.gaya]}
+TONE: ${styleMap[input.gaya]}
 TOKOH UTAMA: ${input.tokohUtama}
 ASAL DAERAH: ${input.asalDaerah}
 LATAR WAKTU: ${input.latar}${input.latarDetail ? ` - ${input.latarDetail}` : ''}
@@ -71,12 +76,40 @@ Hasilkan JSON dengan struktur Screenplay lengkap:
 - actors: array karakter (name, role, persona, costume, voiceDescription)
 - plotOutline: { pembuka, risingAction, klimaks, resolusi }
 - conflict: konflik utama
-- scenes: array 18-22 scene, tiap scene { sceneNumber, title, setting, timeOfDay, durationSeconds:10, action, voiceOver, musicMood, actors }
+- scenes: array 18-22 scene, tiap scene { sceneNumber, title, setting, timeOfDay, durationSeconds:10, action, voiceOver, dialog, musicMood, actors }
 - musicTheme: tema musik keseluruhan
 - wardrobeNotes: catatan busana/kostum umum
 
 Pastikan scenes membentuk cerita yang koheren minimal 3 menit total (18+ scene × 10 detik).
+Panjang scenes script harus proporsional dengan 10 detik
+yang diberikan (asumsi ±2.5 kata per detik untuk voice over bahasa Indonesia).
+Sertakan juga Dialog pendukung untuk menambah sinematik dan interaktifitas cerita.
 Gunakan bahasa Indonesia yang kaya dan vivid.
+
+**Few-shot Layer:**
+Contoh input: "Malin Kundang tapi settingnya di kota metropolitan modern"
+Contoh output (dipotong): { "title": "Anak yang Lupa Jalan Pulang",
+"tone": "drama-urban-kontemplatif", "conflict": "kesuksesan karier vs
+akar keluarga", ... }
+→ Perhatikan: tone & conflict diadaptasi ke konteks modern TANPA
+mengubah pesan moral inti cerita asli.
+
+**Guardrail Layer:**
+- JANGAN mengubah nilai moral/pesan inti cerita rakyat asli menjadi
+  sesuatu yang bertentangan (mis. mengglorifikasi perilaku yang
+  aslinya jadi pelajaran moral negatif)
+- JANGAN menyertakan nama tokoh publik nyata sebagai karakter
+- JANGAN keluarkan teks lain selain JSON valid
+- Jika ide cerita mengandung unsur SARA/kekerasan eksplisit, tolak
+  dengan pesan error terstruktur, jangan tetap diproses
+
+**Chaining Layer:**
+Output JSON dari agent ini menjadi input untuk 3 agent berikutnya:
+- characters[] → Asset Generator (persona & wardrobe)
+- plot + conflict + setting → Storyboard Generator
+- music_mood → Music Prompt Generator
+Pastikan field names konsisten karena akan di-parse otomatis oleh
+agent berikutnya (tidak ada normalisasi manual di antara agent).
 `;
 
   if (signal?.aborted) throw new Error('Dibatalkan');
@@ -102,7 +135,7 @@ Kamu adalah sutradara film profesional.
 Berdasarkan naskah cerita berikut, buat storyboard visual untuk setiap scene.
 
 Judul: "${screenplay.title}"
-Gaya: ${style}
+Tone: ${style}
 Aktor: ${screenplay.actors.map((a) => `${a.name} (${a.costume})`).join(', ')}
 
 Scenes:
