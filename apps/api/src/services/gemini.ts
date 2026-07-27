@@ -4,7 +4,6 @@ import {
   type Screenplay,
   type StoryboardScene,
   type AudioPrompt,
-  AudioType,
   StoryStyle,
 } from '@legenda/shared-types';
 
@@ -64,7 +63,7 @@ IDE: "${input.ide}"
 TONE: ${styleMap[input.gaya]}
 TOKOH UTAMA: ${input.tokohUtama}
 ASAL DAERAH: ${input.asalDaerah}
-LATAR WAKTU: ${input.latar}${input.latarDetail ? ` - ${input.latarDetail}` : ''}
+LATAR WAKTU: ${input.latar} ${input.latarDetail ? ` - ${input.latarDetail}` : ''}
 PLOT: "${input.plot}"
 
 
@@ -115,13 +114,17 @@ agent berikutnya (tidak ada normalisasi manual di antara agent).
 
   if (signal?.aborted) throw new Error('Dibatalkan');
   console.log('[Gemini] Calling generateContent...');
-  const result = await model.generateContent(prompt);
+  const result = signal ? await model.generateContent(prompt, { signal }) : await model.generateContent(prompt);
   console.log('[Gemini] Result:', result ? 'defined' : 'undefined', result?.response ? 'has response' : 'no response');
   if (signal?.aborted) throw new Error('Dibatalkan');
   if (!result || !result.response) throw new Error('Gemini returned empty response');
   const text = result.response.text();
   if (!text) throw new Error('Gemini returned empty text');
-  return JSON.parse(text) as Screenplay;
+  try {
+    return JSON.parse(text) as Screenplay;
+  } catch {
+    throw new Error('Gemini returned invalid JSON');
+  }
 }
 
 // ── Storyboard ────────────────────────────────────────────────────────────────
@@ -162,7 +165,11 @@ Untuk setiap scene, hasilkan JSON array StoryboardScene:
   if (!result || !result.response) throw new Error('Gemini returned empty response');
   const text = result.response.text();
   if (!text) throw new Error('Gemini returned empty text');
-  return JSON.parse(text) as StoryboardScene[];
+  try {
+    return JSON.parse(text) as StoryboardScene[];
+  } catch {
+    throw new Error('Gemini returned invalid JSON');
+  }
 }
 
 // ── Audio Prompts ─────────────────────────────────────────────────────────────
@@ -196,8 +203,12 @@ Format: [{
   if (signal?.aborted) throw new Error('Dibatalkan');
   const result = await model.generateContent(prompt);
   if (signal?.aborted) throw new Error('Dibatalkan');
-  if (!result.response) throw new Error('Gemini returned empty response');
+  if (!result || !result.response) throw new Error('Gemini returned empty response');
   const text = result.response.text();
   if (!text) throw new Error('Gemini returned empty text');
-  return JSON.parse(text) as AudioPrompt[];
+  try {
+    return JSON.parse(text) as AudioPrompt[];
+  } catch {
+    throw new Error('Gemini returned invalid JSON');
+  }
 }

@@ -78,6 +78,7 @@ export interface SceneScript {
   durationSeconds: number;
   action: string;
   voiceOver: string;
+  dialog: string;
   musicMood: string;
   actors: string[];
 }

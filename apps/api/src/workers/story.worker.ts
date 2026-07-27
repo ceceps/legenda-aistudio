@@ -9,7 +9,7 @@ import {
   registerAbort,
   clearAbort,
 } from '../services/gemini.js';
-import { ProjectStatus, AudioType } from '@legenda/shared-types';
+import { ProjectStatus, AudioType, type MasterPromptInput } from '@legenda/shared-types';
 import { type PipelineJobData } from '../lib/queue.js';
 
 // ── Exported pure function for testing ─────────────────────────────────────────
@@ -32,15 +32,17 @@ export async function processStoryJob(job: { id: string; data: PipelineJobData }
 
     if (signal.aborted) throw new Error('Dibatalkan oleh pengguna');
 
-    const input = {
+    const input: MasterPromptInput = {
       ide: project.ide,
       gaya: project.gaya as any,
       tokohUtama: project.tokohUtama,
       asalDaerah: project.asalDaerah,
       latar: project.latar as any,
-      latarDetail: project.latarDetail ?? undefined,
       plot: project.plot,
     };
+    if (project.latarDetail !== null && project.latarDetail !== undefined) {
+      input.latarDetail = project.latarDetail;
+    }
 
     broadcastProgress({
       projectId,
@@ -162,15 +164,17 @@ export const storyWorker = new Worker<PipelineJobData>(
 
       if (signal.aborted) throw new Error('Dibatalkan oleh pengguna');
 
-      const input = {
+      const input: MasterPromptInput = {
         ide: project.ide,
         gaya: project.gaya as any,
         tokohUtama: project.tokohUtama,
         asalDaerah: project.asalDaerah,
         latar: project.latar as any,
-        latarDetail: project.latarDetail ?? undefined,
         plot: project.plot,
       };
+      if (project.latarDetail !== null && project.latarDetail !== undefined) {
+        input.latarDetail = project.latarDetail;
+      }
 
       broadcastProgress({
         projectId,

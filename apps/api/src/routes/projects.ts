@@ -35,7 +35,7 @@ function toDTO(p: Awaited<ReturnType<typeof prisma.project.findUnique>>): Projec
       tokohUtama: p.tokohUtama,
       asalDaerah: p.asalDaerah,
       latar: p.latar as ProjectDTO['masterPrompt']['latar'],
-      latarDetail: p.latarDetail ?? undefined,
+      latarDetail: p.latarDetail ?? '',
       plot: p.plot,
     },
     finalVideoUrl: p.finalVideoUrl ?? undefined,
@@ -92,7 +92,7 @@ projectsRouter.post('/', async (req: Request, res: Response) => {
       tokohUtama: input.tokohUtama,
       asalDaerah: input.asalDaerah,
       latar: input.latar,
-      latarDetail: input.latarDetail,
+      latarDetail: input.latarDetail ?? null,
       plot: input.plot,
     },
   });

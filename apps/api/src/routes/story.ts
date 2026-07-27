@@ -1,8 +1,8 @@
 import { Router, type Request, type Response } from 'express';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
-import { generateScreenplay, type MasterPromptInput } from '../services/gemini.js';
-import { StoryStyle, HistoricalEra, ProjectStatus, type Screenplay, type ApiResponse } from '@legenda/shared-types';
+import { generateScreenplay } from '../services/gemini.js';
+import { StoryStyle, HistoricalEra, ProjectStatus, type Screenplay, type MasterPromptInput, type ApiResponse } from '@legenda/shared-types';
 
 export const storyRouter: ReturnType<typeof Router> = Router();
 
@@ -25,8 +25,16 @@ storyRouter.post('/generate', async (req: Request, res: Response) => {
     return;
   }
 
-  const input: MasterPromptInput = parse.data;
-  let projectId = input.projectId;
+  const { projectId, ...promptInput } = parse.data;
+  const input: MasterPromptInput = {
+    ide: promptInput.ide,
+    gaya: promptInput.gaya,
+    tokohUtama: promptInput.tokohUtama,
+    asalDaerah: promptInput.asalDaerah,
+    latar: promptInput.latar,
+    plot: promptInput.plot,
+    ...(promptInput.latarDetail !== undefined && { latarDetail: promptInput.latarDetail }),
+  };
 
   try {
     // If projectId provided, update its status
