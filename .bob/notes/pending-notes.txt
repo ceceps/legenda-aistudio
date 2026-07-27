@@ -1,0 +1,9 @@
+{"id":"02bf7531-5268-4f0e-83bd-31fa9d491a6c","ts":"2026-07-27T05:42:57.041Z","path":"/home/ceceps/projects/legenda-aistudio/infra/Dockerfile.api","version":"1.0.0","taskID":"71beef50-cfa4-49fa-b9f3-b55b1e321d42"}
+{"id":"0546de5f-6315-46d7-b03e-337e49d0f28d","ts":"2026-07-27T05:43:10.089Z","path":"/home/ceceps/projects/legenda-aistudio/infra/Dockerfile.web","version":"1.0.0","taskID":"71beef50-cfa4-49fa-b9f3-b55b1e321d42"}
+{"id":"73fa5862-99f1-4e9f-9829-29030c0f17de","ts":"2026-07-27T05:53:29.929Z","path":"/home/ceceps/projects/legenda-aistudio/apps/api/src/services/composio-google.ts","version":"1.0.0","taskID":"71beef50-cfa4-49fa-b9f3-b55b1e321d42"}
+{"id":"6d9e8714-ac07-4935-a642-7ca804e8beb2","ts":"2026-07-27T05:53:47.608Z","path":"/home/ceceps/projects/legenda-aistudio/apps/api/src/services/google-unified.ts","version":"1.0.0","taskID":"71beef50-cfa4-49fa-b9f3-b55b1e321d42"}
+{"id":"b6d5df7f-2d76-4565-bf3a-fd477ae5b2f5","ts":"2026-07-27T05:54:33.362Z","path":"/home/ceceps/projects/legenda-aistudio/COMPOSIO-GOOGLE-SETUP.md","version":"1.0.0","taskID":"71beef50-cfa4-49fa-b9f3-b55b1e321d42"}
+{"id":"08c195b7-1246-4bdc-944f-0a4f7d28dc52","ts":"2026-07-27T05:54:47.037Z","path":"/home/ceceps/projects/legenda-aistudio/apps/api/src/index.ts","version":"1.0.0","taskID":"71beef50-cfa4-49fa-b9f3-b55b1e321d42"}
+{"id":"c71d1d10-73e5-44ce-a85e-050701bca0f9","ts":"2026-07-27T05:54:53.538Z","path":"/home/ceceps/projects/legenda-aistudio/apps/api/src/index.ts","version":"1.0.0","taskID":"71beef50-cfa4-49fa-b9f3-b55b1e321d42"}
+{"id":"8036d271-8354-4177-84d0-da07c8be5f95","ts":"2026-07-27T06:15:18.887Z","path":"/home/ceceps/projects/legenda-aistudio/package.json","version":"1.0.0","taskID":"71beef50-cfa4-49fa-b9f3-b55b1e321d42"}
+{"id":"cd37ca75-a7c7-49c5-b7ea-530f3a597067","ts":"2026-07-27T06:42:08.603Z","path":"/home/ceceps/projects/legenda-aistudio/SETUP-GUIDE.md","version":"1.0.0","taskID":"71beef50-cfa4-49fa-b9f3-b55b1e321d42"}

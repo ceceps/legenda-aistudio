@@ -8560,7 +8560,7 @@ export namespace Prisma {
   }
 
   export type ProjectCreateInput = {
-    id: string
+    id?: string
     title: string
     status?: $Enums.ProjectStatus
     ide: string
@@ -8577,7 +8577,7 @@ export namespace Prisma {
     totalScenes?: number
     completedScenes?: number
     createdAt?: Date | string
-    updatedAt: Date | string
+    updatedAt?: Date | string
     Asset?: AssetCreateNestedManyWithoutProjectInput
     AudioAsset?: AudioAssetCreateNestedManyWithoutProjectInput
     Job?: JobCreateNestedManyWithoutProjectInput
@@ -8585,7 +8585,7 @@ export namespace Prisma {
   }
 
   export type ProjectUncheckedCreateInput = {
-    id: string
+    id?: string
     title: string
     status?: $Enums.ProjectStatus
     ide: string
@@ -8602,7 +8602,7 @@ export namespace Prisma {
     totalScenes?: number
     completedScenes?: number
     createdAt?: Date | string
-    updatedAt: Date | string
+    updatedAt?: Date | string
     Asset?: AssetUncheckedCreateNestedManyWithoutProjectInput
     AudioAsset?: AudioAssetUncheckedCreateNestedManyWithoutProjectInput
     Job?: JobUncheckedCreateNestedManyWithoutProjectInput
@@ -8660,7 +8660,7 @@ export namespace Prisma {
   }
 
   export type ProjectCreateManyInput = {
-    id: string
+    id?: string
     title: string
     status?: $Enums.ProjectStatus
     ide: string
@@ -8677,7 +8677,7 @@ export namespace Prisma {
     totalScenes?: number
     completedScenes?: number
     createdAt?: Date | string
-    updatedAt: Date | string
+    updatedAt?: Date | string
   }
 
   export type ProjectUpdateManyMutationInput = {
@@ -8741,7 +8741,7 @@ export namespace Prisma {
     durationSeconds?: number
     status?: $Enums.JobStatus
     createdAt?: Date | string
-    updatedAt: Date | string
+    updatedAt?: Date | string
     Project: ProjectCreateNestedOneWithoutSceneInput
   }
 
@@ -8765,7 +8765,7 @@ export namespace Prisma {
     durationSeconds?: number
     status?: $Enums.JobStatus
     createdAt?: Date | string
-    updatedAt: Date | string
+    updatedAt?: Date | string
   }
 
   export type SceneUpdateInput = {
@@ -8834,7 +8834,7 @@ export namespace Prisma {
     durationSeconds?: number
     status?: $Enums.JobStatus
     createdAt?: Date | string
-    updatedAt: Date | string
+    updatedAt?: Date | string
   }
 
   export type SceneUpdateManyMutationInput = {
@@ -10028,7 +10028,7 @@ export namespace Prisma {
   }
 
   export type ProjectCreateWithoutAssetInput = {
-    id: string
+    id?: string
     title: string
     status?: $Enums.ProjectStatus
     ide: string
@@ -10045,14 +10045,14 @@ export namespace Prisma {
     totalScenes?: number
     completedScenes?: number
     createdAt?: Date | string
-    updatedAt: Date | string
+    updatedAt?: Date | string
     AudioAsset?: AudioAssetCreateNestedManyWithoutProjectInput
     Job?: JobCreateNestedManyWithoutProjectInput
     Scene?: SceneCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutAssetInput = {
-    id: string
+    id?: string
     title: string
     status?: $Enums.ProjectStatus
     ide: string
@@ -10069,7 +10069,7 @@ export namespace Prisma {
     totalScenes?: number
     completedScenes?: number
     createdAt?: Date | string
-    updatedAt: Date | string
+    updatedAt?: Date | string
     AudioAsset?: AudioAssetUncheckedCreateNestedManyWithoutProjectInput
     Job?: JobUncheckedCreateNestedManyWithoutProjectInput
     Scene?: SceneUncheckedCreateNestedManyWithoutProjectInput
@@ -10140,7 +10140,7 @@ export namespace Prisma {
   }
 
   export type ProjectCreateWithoutAudioAssetInput = {
-    id: string
+    id?: string
     title: string
     status?: $Enums.ProjectStatus
     ide: string
@@ -10157,14 +10157,14 @@ export namespace Prisma {
     totalScenes?: number
     completedScenes?: number
     createdAt?: Date | string
-    updatedAt: Date | string
+    updatedAt?: Date | string
     Asset?: AssetCreateNestedManyWithoutProjectInput
     Job?: JobCreateNestedManyWithoutProjectInput
     Scene?: SceneCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutAudioAssetInput = {
-    id: string
+    id?: string
     title: string
     status?: $Enums.ProjectStatus
     ide: string
@@ -10181,7 +10181,7 @@ export namespace Prisma {
     totalScenes?: number
     completedScenes?: number
     createdAt?: Date | string
-    updatedAt: Date | string
+    updatedAt?: Date | string
     Asset?: AssetUncheckedCreateNestedManyWithoutProjectInput
     Job?: JobUncheckedCreateNestedManyWithoutProjectInput
     Scene?: SceneUncheckedCreateNestedManyWithoutProjectInput
@@ -10252,7 +10252,7 @@ export namespace Prisma {
   }
 
   export type ProjectCreateWithoutJobInput = {
-    id: string
+    id?: string
     title: string
     status?: $Enums.ProjectStatus
     ide: string
@@ -10269,14 +10269,14 @@ export namespace Prisma {
     totalScenes?: number
     completedScenes?: number
     createdAt?: Date | string
-    updatedAt: Date | string
+    updatedAt?: Date | string
     Asset?: AssetCreateNestedManyWithoutProjectInput
     AudioAsset?: AudioAssetCreateNestedManyWithoutProjectInput
     Scene?: SceneCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutJobInput = {
-    id: string
+    id?: string
     title: string
     status?: $Enums.ProjectStatus
     ide: string
@@ -10293,7 +10293,7 @@ export namespace Prisma {
     totalScenes?: number
     completedScenes?: number
     createdAt?: Date | string
-    updatedAt: Date | string
+    updatedAt?: Date | string
     Asset?: AssetUncheckedCreateNestedManyWithoutProjectInput
     AudioAsset?: AudioAssetUncheckedCreateNestedManyWithoutProjectInput
     Scene?: SceneUncheckedCreateNestedManyWithoutProjectInput
@@ -10488,7 +10488,7 @@ export namespace Prisma {
     durationSeconds?: number
     status?: $Enums.JobStatus
     createdAt?: Date | string
-    updatedAt: Date | string
+    updatedAt?: Date | string
   }
 
   export type SceneUncheckedCreateWithoutProjectInput = {
@@ -10510,7 +10510,7 @@ export namespace Prisma {
     durationSeconds?: number
     status?: $Enums.JobStatus
     createdAt?: Date | string
-    updatedAt: Date | string
+    updatedAt?: Date | string
   }
 
   export type SceneCreateOrConnectWithoutProjectInput = {
@@ -10664,7 +10664,7 @@ export namespace Prisma {
   }
 
   export type ProjectCreateWithoutSceneInput = {
-    id: string
+    id?: string
     title: string
     status?: $Enums.ProjectStatus
     ide: string
@@ -10681,14 +10681,14 @@ export namespace Prisma {
     totalScenes?: number
     completedScenes?: number
     createdAt?: Date | string
-    updatedAt: Date | string
+    updatedAt?: Date | string
     Asset?: AssetCreateNestedManyWithoutProjectInput
     AudioAsset?: AudioAssetCreateNestedManyWithoutProjectInput
     Job?: JobCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutSceneInput = {
-    id: string
+    id?: string
     title: string
     status?: $Enums.ProjectStatus
     ide: string
@@ -10705,7 +10705,7 @@ export namespace Prisma {
     totalScenes?: number
     completedScenes?: number
     createdAt?: Date | string
-    updatedAt: Date | string
+    updatedAt?: Date | string
     Asset?: AssetUncheckedCreateNestedManyWithoutProjectInput
     AudioAsset?: AudioAssetUncheckedCreateNestedManyWithoutProjectInput
     Job?: JobUncheckedCreateNestedManyWithoutProjectInput
@@ -10832,7 +10832,7 @@ export namespace Prisma {
     durationSeconds?: number
     status?: $Enums.JobStatus
     createdAt?: Date | string
-    updatedAt: Date | string
+    updatedAt?: Date | string
   }
 
   export type AssetUpdateWithoutProjectInput = {

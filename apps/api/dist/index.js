@@ -10,6 +10,7 @@ import { pipelineRouter } from './routes/pipeline.js';
 import { storyboardRouter } from './routes/storyboard.js';
 import { assetsRouter } from './routes/assets.js';
 import { audioRouter } from './routes/audio.js';
+import { checkGoogleServicesHealth, getGoogleServiceMode } from './services/google-unified.js';
 // ── Register all workers (starts listening to queues) ────────────────────────
 import './workers/story.worker.js';
 import './workers/asset.worker.js';
@@ -32,6 +33,29 @@ app.use('/api/projects', audioRouter);
 app.use('/api/pipeline', pipelineRouter);
 app.get('/api/health', (_req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+app.get('/api/health/google', async (_req, res) => {
+    try {
+        const health = await checkGoogleServicesHealth();
+        res.json({
+            status: 'ok',
+            mode: health.mode,
+            services: {
+                drive: health.drive,
+                tts: health.tts,
+            },
+            details: health.details,
+            timestamp: new Date().toISOString(),
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            status: 'error',
+            mode: getGoogleServiceMode(),
+            error: error instanceof Error ? error.message : 'Unknown error',
+            timestamp: new Date().toISOString(),
+        });
+    }
 });
 // ── WebSocket ─────────────────────────────────────────────────────────────────
 initWebSocket(httpServer);

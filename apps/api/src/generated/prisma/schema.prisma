@@ -53,7 +53,7 @@ model Job {
 }
 
 model Project {
-  id              String        @id
+  id              String        @id @default(cuid())
   title           String
   status          ProjectStatus @default(DRAFT)
   ide             String
@@ -70,7 +70,7 @@ model Project {
   totalScenes     Int           @default(0)
   completedScenes Int           @default(0)
   createdAt       DateTime      @default(now())
-  updatedAt       DateTime
+  updatedAt       DateTime      @updatedAt
   Asset           Asset[]
   AudioAsset      AudioAsset[]
   Job             Job[]
@@ -97,7 +97,7 @@ model Scene {
   durationSeconds Int       @default(10)
   status          JobStatus @default(PENDING)
   createdAt       DateTime  @default(now())
-  updatedAt       DateTime
+  updatedAt       DateTime  @updatedAt
   Project         Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@unique([projectId, sceneNumber])

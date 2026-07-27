@@ -32,9 +32,26 @@ export function ProjectPage() {
     await api.pipeline.start(id);
   };
 
+  const handleCancelPipeline = async () => {
+    if (!id) return;
+    await api.pipeline.cancel(id);
+    if (currentProject) {
+      setCurrentProject({ ...currentProject, status: 'FAILED' as any });
+    }
+  };
+
   const project = currentProject;
   if (isLoading) return <p className="text-muted-foreground">Memuat project...</p>;
   if (!project) return <p className="text-muted-foreground">Project tidak ditemukan.</p>;
+
+  const isGenerating = [
+    ProjectStatus.STORY_GENERATING,
+    ProjectStatus.ASSETS_GENERATING,
+    ProjectStatus.AUDIO_GENERATING,
+    ProjectStatus.STORYBOARD_GENERATING,
+    ProjectStatus.VIDEO_GENERATING,
+    ProjectStatus.ASSEMBLING,
+  ].includes(project.status as ProjectStatus);
 
   const currentStatus = pipelineProgress?.stage ?? project.status;
   const progress = pipelineProgress?.progress
@@ -71,13 +88,27 @@ export function ProjectPage() {
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          {project.status === ProjectStatus.DRAFT && (
+          {(project.status === ProjectStatus.DRAFT || project.status === ProjectStatus.FAILED) && (
             <button
               onClick={handleStartPipeline}
               className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
             >
-              🚀 Mulai Pipeline
+              {project.status === ProjectStatus.FAILED ? '🔄 Coba Lagi' : '🚀 Mulai Pipeline'}
             </button>
+          )}
+          {isGenerating && (
+            <>
+              <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span className="inline-block h-2 w-2 rounded-full bg-primary animate-pulse" />
+                Sedang diproses...
+              </span>
+              <button
+                onClick={handleCancelPipeline}
+                className="rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-2 text-sm font-medium text-destructive hover:bg-destructive/20 transition-colors"
+              >
+                ✕ Batal
+              </button>
+            </>
           )}
           {project.status === ProjectStatus.COMPLETED && (
             <Link

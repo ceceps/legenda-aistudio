@@ -8,16 +8,42 @@ import {
   StoryStyle,
 } from '@legenda/shared-types';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY ?? '');
+const apiKey = process.env.GEMINI_API_KEY;
+if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
+const genAI = new GoogleGenerativeAI(apiKey);
 
 const model = genAI.getGenerativeModel({
-  model: 'gemini-2.0-flash-exp',
+  model: 'gemini-1.5-flash',
   generationConfig: { responseMimeType: 'application/json' },
 });
 
+// ── AbortController registry ──────────────────────────────────────────────────
+const abortControllers = new Map<string, AbortController>();
+
+export function registerAbort(projectId: string): AbortController {
+  const ctrl = new AbortController();
+  abortControllers.set(projectId, ctrl);
+  return ctrl;
+}
+
+export function abortProject(projectId: string): boolean {
+  const ctrl = abortControllers.get(projectId);
+  if (!ctrl) return false;
+  ctrl.abort();
+  abortControllers.delete(projectId);
+  return true;
+}
+
+export function clearAbort(projectId: string) {
+  abortControllers.delete(projectId);
+}
+
 // ── Screenplay ────────────────────────────────────────────────────────────────
 
-export async function generateScreenplay(input: MasterPromptInput): Promise<Screenplay> {
+export async function generateScreenplay(
+  input: MasterPromptInput,
+  signal?: AbortSignal,
+): Promise<Screenplay> {
   const styleMap: Record<StoryStyle, string> = {
     [StoryStyle.KLASIK]: 'klasik tradisional dengan bahasa sastra',
     [StoryStyle.SAAT_INI]: 'modern kontemporer masa kini',
@@ -53,7 +79,9 @@ Pastikan scenes membentuk cerita yang koheren minimal 3 menit total (18+ scene �
 Gunakan bahasa Indonesia yang kaya dan vivid.
 `;
 
+  if (signal?.aborted) throw new Error('Dibatalkan');
   const result = await model.generateContent(prompt);
+  if (signal?.aborted) throw new Error('Dibatalkan');
   const text = result.response.text();
   return JSON.parse(text) as Screenplay;
 }
@@ -63,6 +91,7 @@ Gunakan bahasa Indonesia yang kaya dan vivid.
 export async function generateStoryboard(
   screenplay: Screenplay,
   style: StoryStyle,
+  signal?: AbortSignal,
 ): Promise<StoryboardScene[]> {
   const prompt = `
 Kamu adalah sutradara film profesional.
@@ -89,14 +118,19 @@ Untuk setiap scene, hasilkan JSON array StoryboardScene:
 }]
 `;
 
+  if (signal?.aborted) throw new Error('Dibatalkan');
   const result = await model.generateContent(prompt);
+  if (signal?.aborted) throw new Error('Dibatalkan');
   const text = result.response.text();
   return JSON.parse(text) as StoryboardScene[];
 }
 
 // ── Audio Prompts ─────────────────────────────────────────────────────────────
 
-export async function generateAudioPrompts(screenplay: Screenplay): Promise<AudioPrompt[]> {
+export async function generateAudioPrompts(
+  screenplay: Screenplay,
+  signal?: AbortSignal,
+): Promise<AudioPrompt[]> {
   const prompt = `
 Berdasarkan naskah cerita berikut, buat 3 prompt audio untuk Suno AI:
 Judul: "${screenplay.title}"
@@ -119,7 +153,9 @@ Format: [{
 }]
 `;
 
+  if (signal?.aborted) throw new Error('Dibatalkan');
   const result = await model.generateContent(prompt);
+  if (signal?.aborted) throw new Error('Dibatalkan');
   const text = result.response.text();
   return JSON.parse(text) as AudioPrompt[];
 }
