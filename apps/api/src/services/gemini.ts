@@ -67,6 +67,7 @@ ASAL DAERAH: ${input.asalDaerah}
 LATAR WAKTU: ${input.latar}${input.latarDetail ? ` - ${input.latarDetail}` : ''}
 PLOT: "${input.plot}"
 
+
 Hasilkan JSON dengan struktur Screenplay lengkap:
 - title: judul cerita
 - logline: ringkasan 1 kalimat
