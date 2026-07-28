@@ -16,7 +16,7 @@ export function ProjectPage() {
   const { currentProject, setCurrentProject, pipelineProgress, resetPipelineProgress, setLoading, isLoading } =
     useProjectStore();
   const [activeTab, setActiveTab] = useState<Tab>('pipeline');
-  usePipelineSocket(id ?? null);
+  usePipelineSocket(id ?? null, currentProject?.status ?? null);
 
   useEffect(() => {
     if (!id) return;

@@ -23,9 +23,13 @@ async function drainProjectJobs(projectId: string) {
   }
 }
 
+function getProjectId(req: Request): string {
+  return req.params['projectId'] as string;
+}
+
 // POST /api/pipeline/:projectId/start
 pipelineRouter.post('/:projectId/start', async (req: Request, res: Response) => {
-  const { projectId } = req.params;
+  const projectId = getProjectId(req);
 
   const project = await prisma.project.findUnique({ where: { id: projectId } });
   if (!project) {
@@ -67,7 +71,7 @@ pipelineRouter.post('/:projectId/start', async (req: Request, res: Response) => 
 
 // POST /api/pipeline/:projectId/cancel
 pipelineRouter.post('/:projectId/cancel', async (req: Request, res: Response) => {
-  const { projectId } = req.params;
+  const projectId = getProjectId(req);
 
   const project = await prisma.project.findUnique({ where: { id: projectId } });
   if (!project) {
@@ -88,7 +92,8 @@ pipelineRouter.post('/:projectId/cancel', async (req: Request, res: Response) =>
 
 // GET /api/pipeline/:projectId/status
 pipelineRouter.get('/:projectId/status', async (req: Request, res: Response) => {
-  const project = await prisma.project.findUnique({ where: { id: req.params['projectId'] } });
+  const projectId = getProjectId(req);
+  const project = await prisma.project.findUnique({ where: { id: projectId } });
   if (!project) {
     res.status(404).json({ success: false, error: 'Project not found' });
     return;

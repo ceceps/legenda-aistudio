@@ -55,14 +55,12 @@ export const assembleWorker = new Worker<PipelineJobData>(
     let voiceOverPath: string | undefined;
 
     const backsound = audioAssets.find(
-      (a: { type: AudioType; audioUrl?: string | null }) =>
-        a.type === AudioType.BACKSOUND && a.audioUrl,
+      (a) => a.type === AudioType.BACKSOUND && a.audioUrl,
     );
     const soundtrack = audioAssets.find(
-      (a: { type: AudioType; audioUrl?: string | null }) =>
-        a.type === AudioType.SOUNDTRACK && a.audioUrl,
+      (a) => a.type === AudioType.SOUNDTRACK && a.audioUrl,
     );
-    const voAsset = audioAssets.find((a: { type: AudioType }) => a.type === AudioType.VOICE_OVER);
+    const voAsset = audioAssets.find((a) => a.type === AudioType.VOICE_OVER);
 
     if (backsound?.audioUrl) {
       backsoundPath = getTmpPath(projectId, 'backsound.mp3');

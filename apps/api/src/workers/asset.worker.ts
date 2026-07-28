@@ -3,8 +3,9 @@ import { connection, audioQueue } from '../lib/queue.js';
 import { prisma } from '../lib/prisma.js';
 import { broadcastProgress } from '../lib/websocket.js';
 import { generateAssetPrompts } from '../services/nemotron.js';
-import { ProjectStatus } from '@legenda/shared-types';
+import { ProjectStatus, AssetType } from '@legenda/shared-types';
 import { type PipelineJobData } from '../lib/queue.js';
+import { randomUUID } from 'crypto';
 
 export const assetWorker = new Worker<PipelineJobData>(
   'asset',
@@ -29,13 +30,17 @@ export const assetWorker = new Worker<PipelineJobData>(
       message: `${assetPrompts.length} prompt aset dibuat. Menyimpan...`, timestamp: new Date().toISOString(),
     });
 
+    const now = new Date();
     await prisma.asset.createMany({
       data: assetPrompts.map((a) => ({
+        id: randomUUID(),
         projectId,
-        type: a.type as any,
+        type: a.type as AssetType,
         name: a.name,
         description: a.description,
         imagePrompt: a.imagePrompt,
+        createdAt: now,
+        updatedAt: now,
       })),
     });
 

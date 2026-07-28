@@ -3,7 +3,7 @@ import { connection, storyboardQueue } from '../lib/queue.js';
 import { prisma } from '../lib/prisma.js';
 import { broadcastProgress } from '../lib/websocket.js';
 import { generateSoundtrack, generateBacksound, waitForSunoJob } from '../services/suno.js';
-import { ProjectStatus, AudioType } from '@legenda/shared-types';
+import { ProjectStatus, AudioType, JobStatus } from '@legenda/shared-types';
 import { type PipelineJobData } from '../lib/queue.js';
 
 export const audioWorker = new Worker<PipelineJobData>(
@@ -22,33 +22,33 @@ export const audioWorker = new Worker<PipelineJobData>(
     const audioAssets = await prisma.audioAsset.findMany({ where: { projectId } });
 
     const soundtrackAsset = audioAssets.find(
-      (a: { type: AudioType }) => a.type === AudioType.SOUNDTRACK,
+      (a) => a.type === AudioType.SOUNDTRACK,
     );
     const backsoundAsset = audioAssets.find(
-      (a: { type: AudioType }) => a.type === AudioType.BACKSOUND,
+      (a) => a.type === AudioType.BACKSOUND,
     );
 
     const results: { id: string; audioUrl: string }[] = [];
 
     if (soundtrackAsset) {
-      const job = await generateSoundtrack({
+      const jobResult = await generateSoundtrack({
         type: AudioType.SOUNDTRACK,
         sunoPrompt: soundtrackAsset.sunoPrompt,
-        lyrics: soundtrackAsset.lyrics ?? undefined,
+        ...(soundtrackAsset.lyrics !== null && soundtrackAsset.lyrics !== undefined && { lyrics: soundtrackAsset.lyrics }),
         mood: soundtrackAsset.mood ?? 'epic',
         genre: soundtrackAsset.genre ?? 'cinematic',
         duration: 180,
       });
       await prisma.audioAsset.update({
         where: { id: soundtrackAsset.id },
-        data: { sunoJobId: job.id, status: 'PROCESSING' },
+        data: { sunoJobId: jobResult.id, status: JobStatus.PROCESSING },
       });
-      const audioUrl = await waitForSunoJob(job.id);
+      const audioUrl = await waitForSunoJob(jobResult.id);
       results.push({ id: soundtrackAsset.id, audioUrl });
     }
 
     if (backsoundAsset) {
-      const job = await generateBacksound({
+      const jobResult = await generateBacksound({
         type: AudioType.BACKSOUND,
         sunoPrompt: backsoundAsset.sunoPrompt,
         mood: backsoundAsset.mood ?? 'cinematic',
@@ -57,9 +57,9 @@ export const audioWorker = new Worker<PipelineJobData>(
       });
       await prisma.audioAsset.update({
         where: { id: backsoundAsset.id },
-        data: { sunoJobId: job.id, status: 'PROCESSING' },
+        data: { sunoJobId: jobResult.id, status: JobStatus.PROCESSING },
       });
-      const audioUrl = await waitForSunoJob(job.id);
+      const audioUrl = await waitForSunoJob(jobResult.id);
       results.push({ id: backsoundAsset.id, audioUrl });
     }
 
@@ -68,7 +68,7 @@ export const audioWorker = new Worker<PipelineJobData>(
       results.map((r) =>
         prisma.audioAsset.update({
           where: { id: r.id },
-          data: { audioUrl: r.audioUrl, status: 'COMPLETED' },
+          data: { audioUrl: r.audioUrl, status: JobStatus.COMPLETED },
         }),
       ),
     );

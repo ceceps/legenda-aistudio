@@ -5,8 +5,9 @@ export const storyboardRouter: ReturnType<typeof Router> = Router();
 
 // GET /api/projects/:id/storyboard
 storyboardRouter.get('/:id/storyboard', async (req: Request, res: Response) => {
+  const projectId = req.params['id'] as string;
   const scenes = await prisma.scene.findMany({
-    where: { projectId: req.params['id'] },
+    where: { projectId },
     orderBy: { sceneNumber: 'asc' },
   });
 

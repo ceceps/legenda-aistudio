@@ -159,16 +159,16 @@ describe('Story Worker - Generate Story Pipeline (direct function)', () => {
     await processStoryJob(job);
 
     // Verify scene data includes screenplay data
-    const sceneCreateCall = mockPrisma.scene.createMany.mock.calls[0][0];
-    expect(sceneCreateCall.data).toHaveLength(18);
-    expect(sceneCreateCall.data[0]).toMatchObject({
+    const sceneCreateCall = mockPrisma.scene.createMany.mock.calls[0]?.[0];
+    expect(sceneCreateCall?.data).toHaveLength(18);
+    expect(sceneCreateCall?.data[0]).toMatchObject({
       projectId,
       sceneNumber: 1,
       title: 'Scene 1',
       imagePrompt: 'Test image prompt',
     });
     // Check that screenplay data was merged (setting, action from screenplay)
-    expect(sceneCreateCall.data[0].setting).toBe('Test');
+    expect(sceneCreateCall?.data[0].setting).toBe('Test');
   });
 
   it('should call generateStoryboard with signal and screenplay', async () => {

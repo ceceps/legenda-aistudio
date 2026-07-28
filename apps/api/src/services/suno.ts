@@ -1,7 +1,13 @@
 import { type AudioPrompt, AudioType } from '@legenda/shared-types';
-import OpenAI from "openai";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
-const SUNO_API_BASE = `${process.env.AIRFORCE_BASE_URL ?? 'https://api.airforce/v1'}`; // update if official endpoint changes
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const SUNO_API_BASE = `${process.env.AIRFORCE_BASE_URL ?? 'https://api.airforce/v1'}`;
+const SOUNDTRACK_DIR = path.resolve(__dirname, '../../assets/projects/audio');
+const soundTrack = path.join(SOUNDTRACK_DIR, 'soundtrack.mp3');
 
 interface SunoGenerateRequest {
   prompt: string;
@@ -20,16 +26,11 @@ interface SunoJobResponse {
 }
 
 async function sunoFetch(path: string, body: object): Promise<SunoJobResponse> {
- 
-const client = new OpenAI({ baseURL: SUNO_API_BASE, apiKey: process.env.AIRFORCE_API_KEY });
-const img = await client.images.generate({ model: "suno-v4.5", prompt: "a red panda coding" });
-console.log(img.data[0].url);
-
   const res = await fetch(`${SUNO_API_BASE}${path}`, {
     method: 'POST',
     headers: {
-      "Accept": 'application/json',      'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.KEI_API_KEY ?? ''}`,
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.AIRFORCE_API_KEY ?? ''}`,
     },
     body: JSON.stringify(body),
   });
@@ -41,8 +42,14 @@ console.log(img.data[0].url);
   return res.json() as Promise<SunoJobResponse>;
 }
 
+function ensureDir(dir: string) {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+}
+
 export async function generateSoundtrack(prompt: AudioPrompt): Promise<SunoJobResponse> {
-  return sunoFetch('/generate', {
+  const res = await sunoFetch('/generate', {
     prompt: prompt.sunoPrompt,
     lyrics: prompt.lyrics,
     duration: prompt.duration,
@@ -50,6 +57,17 @@ export async function generateSoundtrack(prompt: AudioPrompt): Promise<SunoJobRe
     tags: `${prompt.genre}, ${prompt.mood}`,
     title: 'Legenda AI Soundtrack',
   });
+
+  // This is the soundtrack
+  ensureDir(SOUNDTRACK_DIR);
+  if (res.audio_url) {
+    const audioRes = await fetch(res.audio_url);
+    if (audioRes.ok) {
+      const buffer = Buffer.from(await audioRes.arrayBuffer());
+      await fs.promises.writeFile(soundTrack, buffer);
+    }
+  }
+  return res;
 }
 
 export async function generateBacksound(prompt: AudioPrompt): Promise<SunoJobResponse> {

@@ -10,8 +10,9 @@ export const assetsRouter: ReturnType<typeof Router> = Router();
 
 // GET /api/projects/:id/assets
 assetsRouter.get('/:id/assets', async (req: Request, res: Response) => {
+  const projectId = req.params['id'] as string;
   const assets = await prisma.asset.findMany({
-    where: { projectId: req.params['id'] },
+    where: { projectId },
     orderBy: [{ type: 'asc' }, { name: 'asc' }],
   });
   res.json({ success: true, data: assets });
@@ -19,7 +20,8 @@ assetsRouter.get('/:id/assets', async (req: Request, res: Response) => {
 
 // GET /api/projects/:id/assets/:assetId
 assetsRouter.get('/:id/assets/:assetId', async (req: Request, res: Response) => {
-  const asset = await prisma.asset.findUnique({ where: { id: req.params['assetId'] } });
+  const assetId = req.params['assetId'] as string;
+  const asset = await prisma.asset.findUnique({ where: { id: assetId } });
   if (!asset) {
     res.status(404).json({ success: false, error: 'Asset not found' });
     return;
@@ -29,7 +31,7 @@ assetsRouter.get('/:id/assets/:assetId', async (req: Request, res: Response) => 
 
 // POST /api/projects/:id/assets/:assetId/regenerate
 assetsRouter.post('/:id/assets/:assetId/regenerate', async (req: Request, res: Response) => {
-  const { assetId } = req.params;
+  const assetId = req.params['assetId'] as string;
 
   const asset = await prisma.asset.findUnique({ where: { id: assetId } });
   if (!asset) {
@@ -74,7 +76,7 @@ assetsRouter.post('/:id/assets/:assetId/regenerate', async (req: Request, res: R
 
 // DELETE /api/projects/:id/assets/:assetId
 assetsRouter.delete('/:id/assets/:assetId', async (req: Request, res: Response) => {
-  const { assetId } = req.params;
+  const assetId = req.params['assetId'] as string;
 
   const asset = await prisma.asset.findUnique({ where: { id: assetId } });
   if (!asset) {
@@ -88,7 +90,7 @@ assetsRouter.delete('/:id/assets/:assetId', async (req: Request, res: Response) 
 
 // POST /api/projects/:id/assets/batch-regenerate
 assetsRouter.post('/:id/assets/batch-regenerate', async (req: Request, res: Response) => {
-  const { id: projectId } = req.params;
+  const projectId = req.params['id'] as string;
   const { assetIds } = req.body as { assetIds?: string[] };
 
   if (!assetIds || !Array.isArray(assetIds) || assetIds.length === 0) {

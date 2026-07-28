@@ -38,17 +38,18 @@ function toDTO(p: Awaited<ReturnType<typeof prisma.project.findUnique>>): Projec
       latarDetail: p.latarDetail ?? '',
       plot: p.plot,
     },
-    finalVideoUrl: p.finalVideoUrl ?? undefined,
-    driveFileId: p.driveFileId ?? undefined,
-    driveShareLink: p.driveShareLink ?? undefined,
     totalScenes: p.totalScenes,
     completedScenes: p.completedScenes,
     createdAt: p.createdAt.toISOString(),
     updatedAt: p.updatedAt.toISOString(),
   };
 
+  if (p.finalVideoUrl) dto.finalVideoUrl = p.finalVideoUrl;
+  if (p.driveFileId) dto.driveFileId = p.driveFileId;
+  if (p.driveShareLink) dto.driveShareLink = p.driveShareLink;
+
   if (p.screenplay !== null && p.screenplay !== undefined) {
-    dto.screenplay = p.screenplay as Screenplay;
+    dto.screenplay = p.screenplay as unknown as Screenplay;
   }
 
   return dto;
@@ -66,7 +67,8 @@ projectsRouter.get('/', async (_req: Request, res: Response) => {
 
 // GET /api/projects/:id
 projectsRouter.get('/:id', async (req: Request, res: Response) => {
-  const project = await prisma.project.findUnique({ where: { id: req.params['id'] } });
+  const projectId = req.params['id'] as string;
+  const project = await prisma.project.findUnique({ where: { id: projectId } });
   if (!project) {
     res.status(404).json({ success: false, error: 'Project not found' });
     return;
@@ -102,6 +104,7 @@ projectsRouter.post('/', async (req: Request, res: Response) => {
 
 // DELETE /api/projects/:id
 projectsRouter.delete('/:id', async (req: Request, res: Response) => {
-  await prisma.project.delete({ where: { id: req.params['id'] } });
+  const projectId = req.params['id'] as string;
+  await prisma.project.delete({ where: { id: projectId } });
   res.json({ success: true });
 });

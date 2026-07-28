@@ -11,8 +11,9 @@ export const audioRouter: ReturnType<typeof Router> = Router();
 
 // GET /api/projects/:id/audio
 audioRouter.get('/:id/audio', async (req: Request, res: Response) => {
+  const projectId = req.params['id'] as string;
   const audio = await prisma.audioAsset.findMany({
-    where: { projectId: req.params['id'] },
+    where: { projectId },
     orderBy: { type: 'asc' },
   });
   res.json({ success: true, data: audio });
@@ -20,7 +21,8 @@ audioRouter.get('/:id/audio', async (req: Request, res: Response) => {
 
 // GET /api/projects/:id/audio/:audioId
 audioRouter.get('/:id/audio/:audioId', async (req: Request, res: Response) => {
-  const audio = await prisma.audioAsset.findUnique({ where: { id: req.params['audioId'] } });
+  const audioId = req.params['audioId'] as string;
+  const audio = await prisma.audioAsset.findUnique({ where: { id: audioId } });
   if (!audio) {
     res.status(404).json({ success: false, error: 'Audio asset not found' });
     return;
@@ -30,7 +32,7 @@ audioRouter.get('/:id/audio/:audioId', async (req: Request, res: Response) => {
 
 // POST /api/projects/:id/audio/:audioId/regenerate
 audioRouter.post('/:id/audio/:audioId/regenerate', async (req: Request, res: Response) => {
-  const { audioId } = req.params;
+  const audioId = req.params['audioId'] as string;
 
   const audio = await prisma.audioAsset.findUnique({ where: { id: audioId } });
   if (!audio) {
@@ -63,7 +65,7 @@ audioRouter.post('/:id/audio/:audioId/regenerate', async (req: Request, res: Res
       const job = await generateSoundtrack({
         type: AudioType.SOUNDTRACK,
         sunoPrompt: audio.sunoPrompt,
-        lyrics: audio.lyrics ?? undefined,
+        ...(audio.lyrics !== null && audio.lyrics !== undefined && { lyrics: audio.lyrics }),
         mood: audio.mood ?? 'epic',
         genre: audio.genre ?? 'cinematic',
         duration: 180,
@@ -110,7 +112,7 @@ audioRouter.post('/:id/audio/:audioId/regenerate', async (req: Request, res: Res
 
 // DELETE /api/projects/:id/audio/:audioId
 audioRouter.delete('/:id/audio/:audioId', async (req: Request, res: Response) => {
-  const { audioId } = req.params;
+  const audioId = req.params['audioId'] as string;
 
   const audio = await prisma.audioAsset.findUnique({ where: { id: audioId } });
   if (!audio) {
@@ -124,7 +126,7 @@ audioRouter.delete('/:id/audio/:audioId', async (req: Request, res: Response) =>
 
 // POST /api/projects/:id/audio/batch-regenerate
 audioRouter.post('/:id/audio/batch-regenerate', async (req: Request, res: Response) => {
-  const { id: projectId } = req.params;
+  const projectId = req.params['id'] as string;
   const { audioIds } = req.body as { audioIds?: string[] };
 
   if (!audioIds || !Array.isArray(audioIds) || audioIds.length === 0) {
@@ -167,7 +169,7 @@ audioRouter.post('/:id/audio/batch-regenerate', async (req: Request, res: Respon
           const job = await generateSoundtrack({
             type: AudioType.SOUNDTRACK,
             sunoPrompt: audio.sunoPrompt,
-            lyrics: audio.lyrics ?? undefined,
+            ...(audio.lyrics !== null && audio.lyrics !== undefined && { lyrics: audio.lyrics }),
             mood: audio.mood ?? 'epic',
             genre: audio.genre ?? 'cinematic',
             duration: 180,

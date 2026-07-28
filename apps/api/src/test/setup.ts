@@ -1,7 +1,17 @@
 import { vi } from 'vitest';
 
 // ── Hoisted mocks (runs before imports) ──────────────────────────────────────
-const mockPrisma = vi.hoisted(() => ({
+const mockPrisma: {
+  project: {
+    findUnique: ReturnType<typeof vi.fn>;
+    update: ReturnType<typeof vi.fn>;
+    create: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
+  };
+  scene: { createMany: ReturnType<typeof vi.fn> };
+  audioAsset: { createMany: ReturnType<typeof vi.fn> };
+  $transaction: ReturnType<typeof vi.fn>;
+} = vi.hoisted(() => ({
   project: {
     findUnique: vi.fn(),
     update: vi.fn(),
@@ -17,14 +27,14 @@ const mockPrisma = vi.hoisted(() => ({
   $transaction: vi.fn(async (cb: any) => cb(mockPrisma)),
 }));
 
-const mockQueue = vi.hoisted(() => ({
+const mockQueue: { add: ReturnType<typeof vi.fn>; getJobs: ReturnType<typeof vi.fn> } = vi.hoisted(() => ({
   add: vi.fn(),
   getJobs: vi.fn().mockResolvedValue([]),
 }));
 
-const mockBroadcastProgress = vi.hoisted(() => vi.fn());
+const mockBroadcastProgress: ReturnType<typeof vi.fn> = vi.hoisted(() => vi.fn());
 
-const mockGenerateContent = vi.hoisted(() => vi.fn());
+const mockGenerateContent: ReturnType<typeof vi.fn> = vi.hoisted(() => vi.fn());
 
 // Create a mock model instance that has generateContent
 const mockModelInstance = vi.hoisted(() => ({
@@ -50,7 +60,7 @@ vi.mock('@google/generative-ai', () => ({ GoogleGenerativeAI: MockGoogleGenerati
 
 // Mock gemini service functions (registerAbort, abortProject, clearAbort)
 vi.mock('@/services/gemini', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual: Record<string, any> = await importOriginal();
   return {
     ...actual,
     registerAbort: vi.fn((projectId: string) => {
