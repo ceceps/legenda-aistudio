@@ -1,4 +1,5 @@
 import { Worker } from 'bullmq';
+import { randomUUID } from 'crypto';
 import { connection, assetQueue } from '../lib/queue.js';
 import { prisma } from '../lib/prisma.js';
 import { broadcastProgress } from '../lib/websocket.js';
@@ -93,6 +94,7 @@ export async function processStoryJob(job: { id: string; data: PipelineJobData }
 
       await tx.scene.createMany({
         data: storyboardScenes.map((s) => ({
+          id: randomUUID(),
           projectId,
           sceneNumber: s.sceneNumber,
           title: s.title,
@@ -110,6 +112,7 @@ export async function processStoryJob(job: { id: string; data: PipelineJobData }
 
       await tx.audioAsset.createMany({
         data: audioPrompts.map((a) => ({
+          id: randomUUID(),
           projectId,
           type: a.type as any,
           sunoPrompt: a.sunoPrompt,
@@ -225,6 +228,7 @@ export const storyWorker = new Worker<PipelineJobData>(
 
         await tx.scene.createMany({
           data: storyboardScenes.map((s) => ({
+            id: randomUUID(),
             projectId,
             sceneNumber: s.sceneNumber,
             title: s.title,
@@ -242,6 +246,7 @@ export const storyWorker = new Worker<PipelineJobData>(
 
         await tx.audioAsset.createMany({
           data: audioPrompts.map((a) => ({
+            id: randomUUID(),
             projectId,
             type: a.type as any,
             sunoPrompt: a.sunoPrompt,
