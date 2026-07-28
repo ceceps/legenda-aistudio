@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const SUNO_API_BASE = `${process.env.AIRFORCE_BASE_URL ?? 'https://api.airforce/v1'}`;
-const SOUNDTRACK_DIR = path.resolve(__dirname, '../../assets/projects/audio');
+const SOUNDTRACK_DIR = path.resolve(__dirname, './assets/projects/project-name/audios/');
 const soundTrack = path.join(SOUNDTRACK_DIR, 'soundtrack.mp3');
 
 interface SunoGenerateRequest {

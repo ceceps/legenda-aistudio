@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from 'express';
 import { prisma } from '../lib/prisma.js';
-import { storyQueue } from '../lib/queue.js';
+import { storyQueue, assetQueue } from '../lib/queue.js';
 import { abortProject } from '../services/gemini.js';
 import { ProjectStatus } from '@legenda/shared-types';
 
@@ -10,7 +10,6 @@ const RESTARTABLE_STATUSES = new Set([
   ProjectStatus.DRAFT,
   ProjectStatus.FAILED,
   ProjectStatus.STORY_GENERATING,
-  ProjectStatus.STORY_DONE,
 ]);
 
 async function drainProjectJobs(projectId: string) {
@@ -33,14 +32,14 @@ pipelineRouter.post('/:projectId/start', async (req: Request, res: Response) => 
 
   const project = await prisma.project.findUnique({ where: { id: projectId } });
   if (!project) {
-    res.status(404).json({ success: false, error: 'Project not found' });
+    res.status(404).json({ success: false, error: 'Project tidak ditemukan' });
     return;
   }
 
   if (!RESTARTABLE_STATUSES.has(project.status as ProjectStatus)) {
     res.status(400).json({
       success: false,
-      error: `Tidak bisa restart dari status: ${project.status}`,
+      error: `Tidak bisa memulai dari status: ${project.status}`,
     });
     return;
   }
@@ -69,13 +68,45 @@ pipelineRouter.post('/:projectId/start', async (req: Request, res: Response) => 
   res.json({ success: true, data: { jobId: projectId, status: ProjectStatus.STORY_GENERATING } });
 });
 
+// POST /api/pipeline/:projectId/continue — lanjut dari STORY_DONE ke generasi aset
+pipelineRouter.post('/:projectId/continue', async (req: Request, res: Response) => {
+  const projectId = getProjectId(req);
+
+  const project = await prisma.project.findUnique({ where: { id: projectId } });
+  if (!project) {
+    res.status(404).json({ success: false, error: 'Project tidak ditemukan' });
+    return;
+  }
+
+  if (project.status !== ProjectStatus.STORY_DONE) {
+    res.status(400).json({
+      success: false,
+      error: `Lanjut hanya bisa dari status STORY_DONE. Status saat ini: ${project.status}`,
+    });
+    return;
+  }
+
+  await prisma.project.update({
+    where: { id: projectId },
+    data: { status: ProjectStatus.ASSETS_GENERATING },
+  });
+
+  await assetQueue.add(
+    'generate-assets',
+    { projectId },
+    { attempts: 3, backoff: { type: 'exponential', delay: 5000 } },
+  );
+
+  res.json({ success: true, data: { jobId: projectId, status: ProjectStatus.ASSETS_GENERATING } });
+});
+
 // POST /api/pipeline/:projectId/cancel
 pipelineRouter.post('/:projectId/cancel', async (req: Request, res: Response) => {
   const projectId = getProjectId(req);
 
   const project = await prisma.project.findUnique({ where: { id: projectId } });
   if (!project) {
-    res.status(404).json({ success: false, error: 'Project not found' });
+    res.status(404).json({ success: false, error: 'Project tidak ditemukan' });
     return;
   }
 
@@ -95,7 +126,7 @@ pipelineRouter.get('/:projectId/status', async (req: Request, res: Response) => 
   const projectId = getProjectId(req);
   const project = await prisma.project.findUnique({ where: { id: projectId } });
   if (!project) {
-    res.status(404).json({ success: false, error: 'Project not found' });
+    res.status(404).json({ success: false, error: 'Project tidak ditemukan' });
     return;
   }
   res.json({

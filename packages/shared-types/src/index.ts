@@ -131,9 +131,10 @@ export interface StoryboardScene {
   videoPrompt: string;
   cameraAngle: string;
   transition: string;
-  voiceOver: string;
+  voiceOver?: string; // optional field
   musicNote: string;
   durationSeconds: number;
+  dialog?: string; // optional dialog field
 }
 
 // ─── API Response shapes ─────────────────────────────────────────────────────

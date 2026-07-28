@@ -28,6 +28,8 @@ export const api = {
   pipeline: {
     start: (projectId: string) =>
       request<{ jobId: string }>(`/pipeline/${projectId}/start`, { method: 'POST' }),
+    continue: (projectId: string) =>
+      request<{ jobId: string }>(`/pipeline/${projectId}/continue`, { method: 'POST' }),
     cancel: (projectId: string) =>
       request<{ status: string }>(`/pipeline/${projectId}/cancel`, { method: 'POST' }),
     status: (projectId: string) => request<ProjectDTO>(`/pipeline/${projectId}/status`),

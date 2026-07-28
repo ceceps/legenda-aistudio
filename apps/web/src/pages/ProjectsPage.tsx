@@ -2,14 +2,40 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useProjectStore } from '@/store/projectStore';
 import { api } from '@/api/client';
-import { ProjectStatus } from '@legenda/shared-types';
+import { ProjectStatus, type ProjectDTO } from '@legenda/shared-types';
 import { Plus, Film } from 'lucide-react';
 
 const STATUS_COLOR: Partial<Record<ProjectStatus, string>> = {
   [ProjectStatus.COMPLETED]: 'bg-green-100 text-green-700',
   [ProjectStatus.FAILED]:    'bg-red-100 text-red-700',
   [ProjectStatus.DRAFT]:     'bg-secondary text-secondary-foreground',
+  [ProjectStatus.STORY_DONE]: 'bg-blue-100 text-blue-700',
 };
+
+// Hitung progress berdasarkan status
+function getProjectProgress(project: ProjectDTO): number {
+  if (project.status === ProjectStatus.COMPLETED) return 100;
+  if (project.status === ProjectStatus.FAILED) return 0;
+  if (project.status === ProjectStatus.DRAFT) return 0;
+
+  // Status dengan screenplay (STORY_DONE+) — hitung progress berdasarkan status
+  if (project.screenplay) {
+    const statusOrder = [
+      ProjectStatus.STORY_DONE,
+      ProjectStatus.ASSETS_GENERATING, ProjectStatus.ASSETS_DONE,
+      ProjectStatus.AUDIO_GENERATING, ProjectStatus.AUDIO_DONE,
+      ProjectStatus.STORYBOARD_GENERATING, ProjectStatus.STORYBOARD_DONE,
+      ProjectStatus.VIDEO_GENERATING, ProjectStatus.VIDEO_DONE,
+      ProjectStatus.ASSEMBLING,
+    ];
+    const idx = statusOrder.indexOf(project.status as ProjectStatus);
+    if (idx >= 0) return Math.round((idx / (statusOrder.length - 1)) * 100);
+  }
+
+  // Status tanpa screenplay (STORY_GENERATING) — progress dari enum order
+  const idx = [...Object.values(ProjectStatus)].indexOf(project.status as ProjectStatus);
+  return Math.round((idx / (Object.values(ProjectStatus).length - 1)) * 100);
+}
 
 export function ProjectsPage() {
   const { projects, setProjects, isLoading, setLoading } = useProjectStore();
@@ -53,9 +79,10 @@ export function ProjectsPage() {
 
       <div className="flex flex-col gap-3">
         {projects.map((project) => {
-          const isProcessing = ![ProjectStatus.DRAFT, ProjectStatus.COMPLETED, ProjectStatus.FAILED].includes(
-            project.status as ProjectStatus,
-          );
+          const progress = getProjectProgress(project);
+          const hasProgress = progress > 0 && progress < 100;
+          const hasScreenplay = !!project.screenplay;
+
           return (
             <Link
               key={project.id}
@@ -70,19 +97,19 @@ export function ProjectsPage() {
                 <p className="text-xs text-muted-foreground truncate">
                   {project.masterPrompt.tokohUtama} · {project.masterPrompt.asalDaerah} · {project.masterPrompt.gaya}
                 </p>
+                {hasScreenplay && (
+                  <p className="text-xs text-muted-foreground/80 truncate">
+                    {project.completedScenes || 0}/{project.totalScenes || 0} scene
+                  </p>
+                )}
               </div>
               <div className="flex items-center gap-3 shrink-0">
-                {isProcessing && (
+                {hasProgress && (
                   <div className="w-24">
                     <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
                       <div
                         className="h-full rounded-full bg-primary transition-all"
-                        style={{
-                          width: `${Math.round(
-                            ([...Object.values(ProjectStatus)].indexOf(project.status as ProjectStatus) /
-                              (Object.values(ProjectStatus).length - 1)) * 100,
-                          )}%`,
-                        }}
+                        style={{ width: `${progress}%` }}
                       />
                     </div>
                   </div>

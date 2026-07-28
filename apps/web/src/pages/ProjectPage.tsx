@@ -25,11 +25,10 @@ const VIEW_ONLY_STATUSES = new Set<string>([
 
 export function ProjectPage() {
   const { id } = useParams<{ id: string }>();
-  const { currentProject, setCurrentProject, pipelineProgress, resetPipelineProgress, setLoading, isLoading } =
+  const { currentProject, setCurrentProject, pipelineProgress, resetPipelineProgress, setLoading, isLoading, setPipelineProgress, updateProjectInList } =
     useProjectStore();
   const [activeTab, setActiveTab] = useState<Tab>('pipeline');
   const [pipelineError, setPipelineError] = useState<string | null>(null);
-  usePipelineSocket(id ?? null, currentProject?.status ?? null);
 
   useEffect(() => {
     if (!id) return;
@@ -39,6 +38,20 @@ export function ProjectPage() {
       setLoading(false);
     });
   }, [id, setCurrentProject, setLoading]);
+
+  usePipelineSocket(id ?? null, currentProject?.status ?? null, (event) => {
+    // Update project jika pipeline mencapai terminal stage — update di store saja (project udah di-get di useEffect awal)
+    if (event.stage === ProjectStatus.STORY_DONE) {
+      updateProjectInList(event as any); // event udah nyamar jadi project data via WebSocket
+    }
+  });
+
+  // Auto-switch ke tab Naskah saat status STORY_DONE
+  useEffect(() => {
+    if (currentProject?.status === ProjectStatus.STORY_DONE && !!currentProject.screenplay) {
+      setActiveTab('screenplay');
+    }
+  }, [currentProject?.status, currentProject?.screenplay]);
 
   const handleStartPipeline = async () => {
     if (!id || !currentProject) return;
@@ -57,10 +70,10 @@ export function ProjectPage() {
     setPipelineError(null);
     resetPipelineProgress();
     setCurrentProject({ ...currentProject, status: ProjectStatus.ASSETS_GENERATING });
-    const res = await api.pipeline.start(id);
+    const res = await api.pipeline.continue(id);
     if (!res.success) {
       setCurrentProject(currentProject);
-      setPipelineError(res.error ?? 'Gagal melanjutkan pipeline. Silakan coba lagi.');
+      setPipelineError(res.error ?? 'Gagal melanjutkan ke generasi aset. Silakan coba lagi.');
     }
   };
 
@@ -74,6 +87,8 @@ export function ProjectPage() {
   const project = currentProject;
   if (isLoading) return <p className="text-muted-foreground">Memuat project...</p>;
   if (!project) return <p className="text-muted-foreground">Project tidak ditemukan.</p>;
+
+  const hasScreenplay = !!project.screenplay;
 
   const isGenerating = [
     ProjectStatus.STORY_GENERATING,
@@ -94,8 +109,6 @@ export function ProjectPage() {
       (Object.values(ProjectStatus).length - 1)) * 100,
   ));
   const message = effectiveProgress?.message ?? `Status: ${project.status}`;
-
-  const hasScreenplay = !!project.screenplay;
   const hasAssets = [
     ProjectStatus.ASSETS_GENERATING, ProjectStatus.ASSETS_DONE,
     ProjectStatus.AUDIO_GENERATING, ProjectStatus.AUDIO_DONE,
@@ -131,13 +144,13 @@ export function ProjectPage() {
               🚀 Proses
             </button>
           )}
-          {/* STORY_DONE: naskah sudah selesai, user perlu klik Proses untuk lanjut ke aset */}
+          {/* STORY_DONE: naskah sudah selesai, user perlu klik Proses Selanjutnya untuk lanjut ke aset */}
           {project.status === ProjectStatus.STORY_DONE && (
             <button
               onClick={handleContinuePipeline}
               className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
             >
-              🚀 Proses
+              ▶️ Proses Selanjutnya
             </button>
           )}
           {/* FAILED: tombol Coba Lagi */}
