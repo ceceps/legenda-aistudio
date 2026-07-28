@@ -7,7 +7,7 @@ const client = new OpenAI({
   baseURL: 'https://integrate.api.nvidia.com/v1',
 });
 
-const MODEL = 'nvidia/llama-3.1-nemotron-70b-instruct';
+const MODEL = 'nvidia/minimaxai/minimax-m3';
 
 // ── Asset Prompts ─────────────────────────────────────────────────────────────
 
