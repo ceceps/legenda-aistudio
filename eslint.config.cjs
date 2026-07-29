@@ -6,6 +6,7 @@ const parser = require('@typescript-eslint/parser');
 module.exports = [
   {
     files: ['**/*.{ts,tsx}'],
+    ignores: ['**/dist/**', '**/node_modules/**', '**/.turbo/**', 'apps/web/src/components/ui/**', '**/generated/**'],
     languageOptions: { parser },
     plugins: { '@typescript-eslint': typescriptEslint },
     rules: {
@@ -15,11 +16,6 @@ module.exports = [
     },
   },
   {
-    ignores: [
-      '**/dist/**',
-      '**/node_modules/**',
-      '**/.turbo/**',
-      'apps/web/src/components/ui/**',
-    ],
+    ignores: ['**/dist/**', '**/node_modules/**', '**/.turbo/**', 'apps/web/src/components/ui/**', '**/generated/**'],
   },
 ];

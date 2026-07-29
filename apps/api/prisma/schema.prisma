@@ -86,7 +86,8 @@ model Scene {
   setting         String
   timeOfDay       String?
   action          String
-  voiceOver       String
+  voiceOver       String?
+  dialog          String?
   musicMood       String?
   actors          String[]
   imagePrompt     String?
