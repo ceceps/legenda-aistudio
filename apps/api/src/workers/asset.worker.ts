@@ -14,7 +14,7 @@ export const assetWorker = new Worker<PipelineJobData>(
 
     broadcastProgress({
       projectId, stage: ProjectStatus.ASSETS_GENERATING, progress: 62,
-      message: 'Nemotron AI membuat prompt visual aset...', timestamp: new Date().toISOString(),
+      message: 'AI membuat prompt visual aset...', timestamp: new Date().toISOString(),
     });
 
     const project = await prisma.project.findUnique({

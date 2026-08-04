@@ -6199,6 +6199,7 @@ export namespace Prisma {
     timeOfDay: string | null
     action: string | null
     voiceOver: string | null
+    dialog: string | null
     musicMood: string | null
     imagePrompt: string | null
     videoPrompt: string | null
@@ -6221,6 +6222,7 @@ export namespace Prisma {
     timeOfDay: string | null
     action: string | null
     voiceOver: string | null
+    dialog: string | null
     musicMood: string | null
     imagePrompt: string | null
     videoPrompt: string | null
@@ -6243,6 +6245,7 @@ export namespace Prisma {
     timeOfDay: number
     action: number
     voiceOver: number
+    dialog: number
     musicMood: number
     actors: number
     imagePrompt: number
@@ -6278,6 +6281,7 @@ export namespace Prisma {
     timeOfDay?: true
     action?: true
     voiceOver?: true
+    dialog?: true
     musicMood?: true
     imagePrompt?: true
     videoPrompt?: true
@@ -6300,6 +6304,7 @@ export namespace Prisma {
     timeOfDay?: true
     action?: true
     voiceOver?: true
+    dialog?: true
     musicMood?: true
     imagePrompt?: true
     videoPrompt?: true
@@ -6322,6 +6327,7 @@ export namespace Prisma {
     timeOfDay?: true
     action?: true
     voiceOver?: true
+    dialog?: true
     musicMood?: true
     actors?: true
     imagePrompt?: true
@@ -6431,7 +6437,8 @@ export namespace Prisma {
     setting: string
     timeOfDay: string | null
     action: string
-    voiceOver: string
+    voiceOver: string | null
+    dialog: string | null
     musicMood: string | null
     actors: string[]
     imagePrompt: string | null
@@ -6474,6 +6481,7 @@ export namespace Prisma {
     timeOfDay?: boolean
     action?: boolean
     voiceOver?: boolean
+    dialog?: boolean
     musicMood?: boolean
     actors?: boolean
     imagePrompt?: boolean
@@ -6498,6 +6506,7 @@ export namespace Prisma {
     timeOfDay?: boolean
     action?: boolean
     voiceOver?: boolean
+    dialog?: boolean
     musicMood?: boolean
     actors?: boolean
     imagePrompt?: boolean
@@ -6522,6 +6531,7 @@ export namespace Prisma {
     timeOfDay?: boolean
     action?: boolean
     voiceOver?: boolean
+    dialog?: boolean
     musicMood?: boolean
     actors?: boolean
     imagePrompt?: boolean
@@ -6546,6 +6556,7 @@ export namespace Prisma {
     timeOfDay?: boolean
     action?: boolean
     voiceOver?: boolean
+    dialog?: boolean
     musicMood?: boolean
     actors?: boolean
     imagePrompt?: boolean
@@ -6560,7 +6571,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type SceneOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "projectId" | "sceneNumber" | "title" | "setting" | "timeOfDay" | "action" | "voiceOver" | "musicMood" | "actors" | "imagePrompt" | "videoPrompt" | "cameraAngle" | "transition" | "storyboardUrl" | "clipUrl" | "durationSeconds" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["scene"]>
+  export type SceneOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "projectId" | "sceneNumber" | "title" | "setting" | "timeOfDay" | "action" | "voiceOver" | "dialog" | "musicMood" | "actors" | "imagePrompt" | "videoPrompt" | "cameraAngle" | "transition" | "storyboardUrl" | "clipUrl" | "durationSeconds" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["scene"]>
   export type SceneInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     Project?: boolean | ProjectDefaultArgs<ExtArgs>
   }
@@ -6584,7 +6595,8 @@ export namespace Prisma {
       setting: string
       timeOfDay: string | null
       action: string
-      voiceOver: string
+      voiceOver: string | null
+      dialog: string | null
       musicMood: string | null
       actors: string[]
       imagePrompt: string | null
@@ -7029,6 +7041,7 @@ export namespace Prisma {
     readonly timeOfDay: FieldRef<"Scene", 'String'>
     readonly action: FieldRef<"Scene", 'String'>
     readonly voiceOver: FieldRef<"Scene", 'String'>
+    readonly dialog: FieldRef<"Scene", 'String'>
     readonly musicMood: FieldRef<"Scene", 'String'>
     readonly actors: FieldRef<"Scene", 'String[]'>
     readonly imagePrompt: FieldRef<"Scene", 'String'>
@@ -7553,6 +7566,7 @@ export namespace Prisma {
     timeOfDay: 'timeOfDay',
     action: 'action',
     voiceOver: 'voiceOver',
+    dialog: 'dialog',
     musicMood: 'musicMood',
     actors: 'actors',
     imagePrompt: 'imagePrompt',
@@ -8172,7 +8186,8 @@ export namespace Prisma {
     setting?: StringFilter<"Scene"> | string
     timeOfDay?: StringNullableFilter<"Scene"> | string | null
     action?: StringFilter<"Scene"> | string
-    voiceOver?: StringFilter<"Scene"> | string
+    voiceOver?: StringNullableFilter<"Scene"> | string | null
+    dialog?: StringNullableFilter<"Scene"> | string | null
     musicMood?: StringNullableFilter<"Scene"> | string | null
     actors?: StringNullableListFilter<"Scene">
     imagePrompt?: StringNullableFilter<"Scene"> | string | null
@@ -8196,7 +8211,8 @@ export namespace Prisma {
     setting?: SortOrder
     timeOfDay?: SortOrderInput | SortOrder
     action?: SortOrder
-    voiceOver?: SortOrder
+    voiceOver?: SortOrderInput | SortOrder
+    dialog?: SortOrderInput | SortOrder
     musicMood?: SortOrderInput | SortOrder
     actors?: SortOrder
     imagePrompt?: SortOrderInput | SortOrder
@@ -8224,7 +8240,8 @@ export namespace Prisma {
     setting?: StringFilter<"Scene"> | string
     timeOfDay?: StringNullableFilter<"Scene"> | string | null
     action?: StringFilter<"Scene"> | string
-    voiceOver?: StringFilter<"Scene"> | string
+    voiceOver?: StringNullableFilter<"Scene"> | string | null
+    dialog?: StringNullableFilter<"Scene"> | string | null
     musicMood?: StringNullableFilter<"Scene"> | string | null
     actors?: StringNullableListFilter<"Scene">
     imagePrompt?: StringNullableFilter<"Scene"> | string | null
@@ -8248,7 +8265,8 @@ export namespace Prisma {
     setting?: SortOrder
     timeOfDay?: SortOrderInput | SortOrder
     action?: SortOrder
-    voiceOver?: SortOrder
+    voiceOver?: SortOrderInput | SortOrder
+    dialog?: SortOrderInput | SortOrder
     musicMood?: SortOrderInput | SortOrder
     actors?: SortOrder
     imagePrompt?: SortOrderInput | SortOrder
@@ -8279,7 +8297,8 @@ export namespace Prisma {
     setting?: StringWithAggregatesFilter<"Scene"> | string
     timeOfDay?: StringNullableWithAggregatesFilter<"Scene"> | string | null
     action?: StringWithAggregatesFilter<"Scene"> | string
-    voiceOver?: StringWithAggregatesFilter<"Scene"> | string
+    voiceOver?: StringNullableWithAggregatesFilter<"Scene"> | string | null
+    dialog?: StringNullableWithAggregatesFilter<"Scene"> | string | null
     musicMood?: StringNullableWithAggregatesFilter<"Scene"> | string | null
     actors?: StringNullableListFilter<"Scene">
     imagePrompt?: StringNullableWithAggregatesFilter<"Scene"> | string | null
@@ -8755,7 +8774,8 @@ export namespace Prisma {
     setting: string
     timeOfDay?: string | null
     action: string
-    voiceOver: string
+    voiceOver?: string | null
+    dialog?: string | null
     musicMood?: string | null
     actors?: SceneCreateactorsInput | string[]
     imagePrompt?: string | null
@@ -8779,7 +8799,8 @@ export namespace Prisma {
     setting: string
     timeOfDay?: string | null
     action: string
-    voiceOver: string
+    voiceOver?: string | null
+    dialog?: string | null
     musicMood?: string | null
     actors?: SceneCreateactorsInput | string[]
     imagePrompt?: string | null
@@ -8801,7 +8822,8 @@ export namespace Prisma {
     setting?: StringFieldUpdateOperationsInput | string
     timeOfDay?: NullableStringFieldUpdateOperationsInput | string | null
     action?: StringFieldUpdateOperationsInput | string
-    voiceOver?: StringFieldUpdateOperationsInput | string
+    voiceOver?: NullableStringFieldUpdateOperationsInput | string | null
+    dialog?: NullableStringFieldUpdateOperationsInput | string | null
     musicMood?: NullableStringFieldUpdateOperationsInput | string | null
     actors?: SceneUpdateactorsInput | string[]
     imagePrompt?: NullableStringFieldUpdateOperationsInput | string | null
@@ -8825,7 +8847,8 @@ export namespace Prisma {
     setting?: StringFieldUpdateOperationsInput | string
     timeOfDay?: NullableStringFieldUpdateOperationsInput | string | null
     action?: StringFieldUpdateOperationsInput | string
-    voiceOver?: StringFieldUpdateOperationsInput | string
+    voiceOver?: NullableStringFieldUpdateOperationsInput | string | null
+    dialog?: NullableStringFieldUpdateOperationsInput | string | null
     musicMood?: NullableStringFieldUpdateOperationsInput | string | null
     actors?: SceneUpdateactorsInput | string[]
     imagePrompt?: NullableStringFieldUpdateOperationsInput | string | null
@@ -8848,7 +8871,8 @@ export namespace Prisma {
     setting: string
     timeOfDay?: string | null
     action: string
-    voiceOver: string
+    voiceOver?: string | null
+    dialog?: string | null
     musicMood?: string | null
     actors?: SceneCreateactorsInput | string[]
     imagePrompt?: string | null
@@ -8870,7 +8894,8 @@ export namespace Prisma {
     setting?: StringFieldUpdateOperationsInput | string
     timeOfDay?: NullableStringFieldUpdateOperationsInput | string | null
     action?: StringFieldUpdateOperationsInput | string
-    voiceOver?: StringFieldUpdateOperationsInput | string
+    voiceOver?: NullableStringFieldUpdateOperationsInput | string | null
+    dialog?: NullableStringFieldUpdateOperationsInput | string | null
     musicMood?: NullableStringFieldUpdateOperationsInput | string | null
     actors?: SceneUpdateactorsInput | string[]
     imagePrompt?: NullableStringFieldUpdateOperationsInput | string | null
@@ -8893,7 +8918,8 @@ export namespace Prisma {
     setting?: StringFieldUpdateOperationsInput | string
     timeOfDay?: NullableStringFieldUpdateOperationsInput | string | null
     action?: StringFieldUpdateOperationsInput | string
-    voiceOver?: StringFieldUpdateOperationsInput | string
+    voiceOver?: NullableStringFieldUpdateOperationsInput | string | null
+    dialog?: NullableStringFieldUpdateOperationsInput | string | null
     musicMood?: NullableStringFieldUpdateOperationsInput | string | null
     actors?: SceneUpdateactorsInput | string[]
     imagePrompt?: NullableStringFieldUpdateOperationsInput | string | null
@@ -9450,6 +9476,7 @@ export namespace Prisma {
     timeOfDay?: SortOrder
     action?: SortOrder
     voiceOver?: SortOrder
+    dialog?: SortOrder
     musicMood?: SortOrder
     actors?: SortOrder
     imagePrompt?: SortOrder
@@ -9478,6 +9505,7 @@ export namespace Prisma {
     timeOfDay?: SortOrder
     action?: SortOrder
     voiceOver?: SortOrder
+    dialog?: SortOrder
     musicMood?: SortOrder
     imagePrompt?: SortOrder
     videoPrompt?: SortOrder
@@ -9500,6 +9528,7 @@ export namespace Prisma {
     timeOfDay?: SortOrder
     action?: SortOrder
     voiceOver?: SortOrder
+    dialog?: SortOrder
     musicMood?: SortOrder
     imagePrompt?: SortOrder
     videoPrompt?: SortOrder
@@ -10517,7 +10546,8 @@ export namespace Prisma {
     setting: string
     timeOfDay?: string | null
     action: string
-    voiceOver: string
+    voiceOver?: string | null
+    dialog?: string | null
     musicMood?: string | null
     actors?: SceneCreateactorsInput | string[]
     imagePrompt?: string | null
@@ -10539,7 +10569,8 @@ export namespace Prisma {
     setting: string
     timeOfDay?: string | null
     action: string
-    voiceOver: string
+    voiceOver?: string | null
+    dialog?: string | null
     musicMood?: string | null
     actors?: SceneCreateactorsInput | string[]
     imagePrompt?: string | null
@@ -10689,7 +10720,8 @@ export namespace Prisma {
     setting?: StringFilter<"Scene"> | string
     timeOfDay?: StringNullableFilter<"Scene"> | string | null
     action?: StringFilter<"Scene"> | string
-    voiceOver?: StringFilter<"Scene"> | string
+    voiceOver?: StringNullableFilter<"Scene"> | string | null
+    dialog?: StringNullableFilter<"Scene"> | string | null
     musicMood?: StringNullableFilter<"Scene"> | string | null
     actors?: StringNullableListFilter<"Scene">
     imagePrompt?: StringNullableFilter<"Scene"> | string | null
@@ -10865,7 +10897,8 @@ export namespace Prisma {
     setting: string
     timeOfDay?: string | null
     action: string
-    voiceOver: string
+    voiceOver?: string | null
+    dialog?: string | null
     musicMood?: string | null
     actors?: SceneCreateactorsInput | string[]
     imagePrompt?: string | null
@@ -11001,7 +11034,8 @@ export namespace Prisma {
     setting?: StringFieldUpdateOperationsInput | string
     timeOfDay?: NullableStringFieldUpdateOperationsInput | string | null
     action?: StringFieldUpdateOperationsInput | string
-    voiceOver?: StringFieldUpdateOperationsInput | string
+    voiceOver?: NullableStringFieldUpdateOperationsInput | string | null
+    dialog?: NullableStringFieldUpdateOperationsInput | string | null
     musicMood?: NullableStringFieldUpdateOperationsInput | string | null
     actors?: SceneUpdateactorsInput | string[]
     imagePrompt?: NullableStringFieldUpdateOperationsInput | string | null
@@ -11023,7 +11057,8 @@ export namespace Prisma {
     setting?: StringFieldUpdateOperationsInput | string
     timeOfDay?: NullableStringFieldUpdateOperationsInput | string | null
     action?: StringFieldUpdateOperationsInput | string
-    voiceOver?: StringFieldUpdateOperationsInput | string
+    voiceOver?: NullableStringFieldUpdateOperationsInput | string | null
+    dialog?: NullableStringFieldUpdateOperationsInput | string | null
     musicMood?: NullableStringFieldUpdateOperationsInput | string | null
     actors?: SceneUpdateactorsInput | string[]
     imagePrompt?: NullableStringFieldUpdateOperationsInput | string | null
@@ -11045,7 +11080,8 @@ export namespace Prisma {
     setting?: StringFieldUpdateOperationsInput | string
     timeOfDay?: NullableStringFieldUpdateOperationsInput | string | null
     action?: StringFieldUpdateOperationsInput | string
-    voiceOver?: StringFieldUpdateOperationsInput | string
+    voiceOver?: NullableStringFieldUpdateOperationsInput | string | null
+    dialog?: NullableStringFieldUpdateOperationsInput | string | null
     musicMood?: NullableStringFieldUpdateOperationsInput | string | null
     actors?: SceneUpdateactorsInput | string[]
     imagePrompt?: NullableStringFieldUpdateOperationsInput | string | null

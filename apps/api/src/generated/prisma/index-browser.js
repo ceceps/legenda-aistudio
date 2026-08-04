@@ -193,6 +193,7 @@ exports.Prisma.SceneScalarFieldEnum = {
   timeOfDay: 'timeOfDay',
   action: 'action',
   voiceOver: 'voiceOver',
+  dialog: 'dialog',
   musicMood: 'musicMood',
   actors: 'actors',
   imagePrompt: 'imagePrompt',

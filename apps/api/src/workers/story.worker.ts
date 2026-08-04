@@ -1,5 +1,6 @@
 import { Worker } from 'bullmq';
-import { connection, assetQueue } from '../lib/queue.js';
+import { randomUUID } from 'crypto';
+import { connection } from '../lib/queue.js';
 import { prisma } from '../lib/prisma.js';
 import { broadcastProgress } from '../lib/websocket.js';
 import {
@@ -60,7 +61,7 @@ export async function processStoryJob(job: { id: string; data: PipelineJobData }
       projectId,
       stage: ProjectStatus.STORY_GENERATING,
       progress: 50,
-      message: 'Menyimpan naskah & membuat storyboard...',
+      message: 'Menyimpan naskah & script storyboard...',
       timestamp: new Date().toISOString(),
     });
 
@@ -93,13 +94,15 @@ export async function processStoryJob(job: { id: string; data: PipelineJobData }
 
       await tx.scene.createMany({
         data: storyboardScenes.map((s) => ({
+          id: randomUUID(),
           projectId,
           sceneNumber: s.sceneNumber,
           title: s.title,
           setting: screenplay.scenes.find((sc) => sc.sceneNumber === s.sceneNumber)?.setting ?? '',
           action: screenplay.scenes.find((sc) => sc.sceneNumber === s.sceneNumber)?.action ?? '',
-          voiceOver: s.voiceOver,
+          voiceOver: s.voiceOver || '',
           musicMood: s.musicNote,
+          dialog: s.dialog || '',
           actors: screenplay.scenes.find((sc) => sc.sceneNumber === s.sceneNumber)?.actors ?? [],
           imagePrompt: s.imagePrompt,
           videoPrompt: s.videoPrompt,
@@ -110,6 +113,7 @@ export async function processStoryJob(job: { id: string; data: PipelineJobData }
 
       await tx.audioAsset.createMany({
         data: audioPrompts.map((a) => ({
+          id: randomUUID(),
           projectId,
           type: a.type as any,
           sunoPrompt: a.sunoPrompt,
@@ -123,21 +127,12 @@ export async function processStoryJob(job: { id: string; data: PipelineJobData }
     broadcastProgress({
       projectId,
       stage: ProjectStatus.STORY_DONE,
-      progress: 80,
-      message: `Naskah selesai! ${storyboardScenes.length} scene dibuat. Memulai generasi aset...`,
+      progress: 100,
+      message: `Naskah selesai! ${storyboardScenes.length} scene dibuat. Tinjau naskah dan tekan "Proses Selanjutnya" untuk melanjutkan.`,
       timestamp: new Date().toISOString(),
     });
 
-    await assetQueue.add(
-      'generate-assets',
-      { projectId },
-      { attempts: 3, backoff: { type: 'exponential', delay: 5000 } },
-    );
-
-    await prisma.project.update({
-      where: { id: projectId },
-      data: { status: ProjectStatus.ASSETS_GENERATING },
-    });
+    // Pipeline berhenti di sini — user harus tekan "Proses Selanjutnya"
   } finally {
     clearAbort(projectId);
   }
@@ -155,7 +150,7 @@ export const storyWorker = new Worker<PipelineJobData>(
         projectId,
         stage: ProjectStatus.STORY_GENERATING,
         progress: 5,
-        message: 'Memulai generasi naskah dengan Gemini AI...',
+        message: 'Memulai generasi naskah dengan AI...',
         timestamp: new Date().toISOString(),
       });
 
@@ -225,13 +220,15 @@ export const storyWorker = new Worker<PipelineJobData>(
 
         await tx.scene.createMany({
           data: storyboardScenes.map((s) => ({
+            id: randomUUID(),
             projectId,
             sceneNumber: s.sceneNumber,
             title: s.title,
             setting: screenplay.scenes.find((sc) => sc.sceneNumber === s.sceneNumber)?.setting ?? '',
             action: screenplay.scenes.find((sc) => sc.sceneNumber === s.sceneNumber)?.action ?? '',
-            voiceOver: s.voiceOver,
+            voiceOver: s.voiceOver ?? '',
             musicMood: s.musicNote,
+            dialog: s.dialog || '',
             actors: screenplay.scenes.find((sc) => sc.sceneNumber === s.sceneNumber)?.actors ?? [],
             imagePrompt: s.imagePrompt,
             videoPrompt: s.videoPrompt,
@@ -242,6 +239,7 @@ export const storyWorker = new Worker<PipelineJobData>(
 
         await tx.audioAsset.createMany({
           data: audioPrompts.map((a) => ({
+            id: randomUUID(),
             projectId,
             type: a.type as any,
             sunoPrompt: a.sunoPrompt,
@@ -255,21 +253,12 @@ export const storyWorker = new Worker<PipelineJobData>(
       broadcastProgress({
         projectId,
         stage: ProjectStatus.STORY_DONE,
-        progress: 80,
-        message: `Naskah selesai! ${storyboardScenes.length} scene dibuat. Memulai generasi aset...`,
+        progress: 100,
+        message: `Naskah selesai! ${storyboardScenes.length} scene dibuat. Tinjau naskah dan tekan "Proses Selanjutnya" untuk melanjutkan.`,
         timestamp: new Date().toISOString(),
       });
 
-      await assetQueue.add(
-        'generate-assets',
-        { projectId },
-        { attempts: 3, backoff: { type: 'exponential', delay: 5000 } },
-      );
-
-      await prisma.project.update({
-        where: { id: projectId },
-        data: { status: ProjectStatus.ASSETS_GENERATING },
-      });
+      // Pipeline berhenti di sini — user harus tekan "Proses Selanjutnya"
     } finally {
       clearAbort(projectId);
     }

@@ -21,7 +21,11 @@ const ACTIVE_PIPELINE_STATUSES = new Set<string>([
   ProjectStatus.ASSEMBLING,
 ]);
 
-export function usePipelineSocket(projectId: string | null, projectStatus: string | null) {
+export function usePipelineSocket(
+  projectId: string | null,
+  projectStatus: string | null,
+  onMessage?: (event: PipelineProgressEvent) => void,
+) {
   const ws = useRef<WebSocket | null>(null);
   const { setPipelineProgress, updateProjectInList } = useProjectStore();
   const [isConnected, setIsConnected] = useState(false);
@@ -52,9 +56,10 @@ export function usePipelineSocket(projectId: string | null, projectStatus: strin
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data as string) as PipelineProgressEvent;
       setPipelineProgress(data);
+      onMessage?.(data);
 
       // Fetch updated project when pipeline reaches terminal stages
-      if (data.stage === ProjectStatus.COMPLETED || data.stage === ProjectStatus.FAILED) {
+      if (data.stage === ProjectStatus.COMPLETED || data.stage === ProjectStatus.FAILED || data.stage === ProjectStatus.STORY_DONE) {
         fetch(`/api/projects/${projectId}`)
           .then((r) => r.json())
           .then((res) => {
